@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.roskvartal.garry.githubviewerfrag.R;
@@ -117,10 +119,47 @@ public class RepoListFragment extends Fragment {
 
         //  TEST Пока просто выводим String из массива при onCreateView.
         //  Потом этот код будет в другом событии (и возможно с разными row_list_repos.xml).
-        ArrayAdapter<GitHubRepo> listAdapter = new ArrayAdapter<>(
+        //  ArrayAdapter<GitHubRepo> listAdapter = new ArrayAdapter<>(
+        //    listener,
+        //    android.R.layout.simple_list_item_1,
+        //    GitHubRepo.repos);
+
+        //  NEW ListView с иконками (указал свой row_list_repo макет).
+        ArrayAdapter<GitHubRepo> listAdapter = new ArrayAdapter<GitHubRepo>(
                 listener,
-                android.R.layout.simple_list_item_1,
-                GitHubRepo.repos);
+                R.layout.row_list_repo,
+                R.id.textRepoName,
+                GitHubRepo.repos) {
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View view = super.getView(position, convertView, parent);
+
+                //  User Avatar
+                ImageView userAvatar = (ImageView) view.findViewById(R.id.imgUserAvatar);
+                userAvatar.setImageResource(GitHubRepo.repos[position].getOwnerAvatarId());
+
+                //  User Name
+                TextView userName = (TextView) view.findViewById(R.id.textUserName);
+                userName.setText(GitHubRepo.repos[position].getOwnerName());
+
+                //  Repo Name
+                TextView repoName = (TextView) view.findViewById(R.id.textRepoName);
+                repoName.setText(GitHubRepo.repos[position].getRepoName());
+
+                //  Repo Desc
+                TextView repoDesc = (TextView) view.findViewById(R.id.textRepoDesc);
+                repoDesc.setText(GitHubRepo.repos[position].getRepoDesc());
+
+                //  Repo Url
+                TextView repoUrl = (TextView) view.findViewById(R.id.textRepoUrl);
+                repoUrl.setText(GitHubRepo.repos[position].getRepoUrl());
+
+
+                return view;
+            }
+        };
         listRepo.setAdapter(listAdapter);
 
         return rootView;

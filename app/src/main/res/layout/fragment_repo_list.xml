@@ -16,9 +16,8 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scaleType="fitStart"
         android:src="@drawable/github_logo"
-        android:contentDescription="@string/app_logo_hint"
+        android:contentDescription="@string/img_logo_desc"
         android:background="@drawable/text_border" />
 
     <!-- Ввод имени пользователя -->
@@ -49,7 +48,7 @@
             android:scaleType="centerInside"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:contentDescription="@string/btn_enter_hint" />
+            android:contentDescription="@string/btn_enter_desc" />
     </RelativeLayout>
 
     <!-- Титл списка -->

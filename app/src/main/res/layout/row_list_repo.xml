@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/layout_padding">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgUserAvatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/img_avatar_desc" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/margin_horizontal"
+            android:paddingStart="@dimen/margin_horizontal">
+
+            <TextView
+                android:id="@+id/textUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/octicon_person_vec"
+                android:drawableStart="@drawable/octicon_person_vec"
+                android:drawablePadding="@dimen/icon_border_padding" />
+
+            <TextView
+                android:id="@+id/textRepoName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_vertical"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/octicon_repo_vec"
+                android:drawableStart="@drawable/octicon_repo_vec"
+                android:drawablePadding="@dimen/icon_border_padding" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textRepoDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_info_vec"
+        android:drawableStart="@drawable/octicon_info_vec"
+        android:drawablePadding="@dimen/icon_border_padding" />
+
+    <TextView
+        android:id="@+id/textRepoUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_link_vec"
+        android:drawableStart="@drawable/octicon_link_vec"
+        android:drawablePadding="@dimen/icon_border_padding" />
+
+</LinearLayout>
