@@ -1,0 +1,11 @@
+<resources>
+    <dimen name="layout_padding">5dp</dimen>
+    <dimen name="margin_vertical">3dp</dimen>
+    <dimen name="margin_horizontal">5dp</dimen>
+    <dimen name="text_border_width">1dp</dimen>
+    <dimen name="text_border_radius">3dp</dimen>
+    <dimen name="text_border_padding">3dp</dimen>
+    <dimen name="btn_icon_size">48dp</dimen>
+    <dimen name="icon_border_padding">3dp</dimen>
+    <dimen name="icon_border_padding1">1dp</dimen>
+</resources>
