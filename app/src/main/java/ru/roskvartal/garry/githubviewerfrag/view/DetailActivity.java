@@ -19,7 +19,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        //  Получение repoID.
+        //  Получение переданного из MainActivity repoID.
         Bundle bundle = getIntent().getExtras();
         if (bundle == null || !bundle.containsKey(RepoDetailFragment.ARG_REPO_ID)) {
             finish();                                                           //  Ничего не передано, выходим из Activity!
@@ -35,7 +35,7 @@ public class DetailActivity extends AppCompatActivity {
         RepoDetailFragment detailFragment =
                 (RepoDetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentRepoDetail);
 
-        //  Передаем repoId Фрагменту, он заполняет представления правильным контентом.
+        //  Передаем repoId фрагменту, он заполнит свои представления правильным контентом.
         detailFragment.setRepoId(repoID);
     }
 }

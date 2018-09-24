@@ -5,14 +5,15 @@
     android:orientation="vertical"
     android:padding="@dimen/layout_padding"
     tools:context="ru.roskvartal.garry.githubviewerfrag.view.RepoDetailFragment">
-<!--
+
+    <!-- Child Fragment -->
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         class="ru.roskvartal.garry.githubviewerfrag.view.RepoMainInfoFragment"
-        android:id="@+id/fragmentRepoDetail"
+        android:id="@+id/fragmentRepoMainInfo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
--->
+        android:layout_height="wrap_content" />
+
     <TextView
         android:id="@+id/textRepoLang"
         android:layout_width="match_parent"

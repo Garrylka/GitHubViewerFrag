@@ -115,29 +115,29 @@ public class RepoListFragment extends Fragment {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
 
-                View view = super.getView(position, convertView, parent);
+                View rootView = super.getView(position, convertView, parent);
 
                 //  User Avatar
-                ImageView userAvatar = view.findViewById(R.id.imgUserAvatar);
+                ImageView userAvatar = rootView.findViewById(R.id.imgUserAvatar);
                 userAvatar.setImageResource(GitHubRepo.repos[position].getOwnerAvatarId());
 
                 //  User Name
-                TextView userName = view.findViewById(R.id.textUserName);
+                TextView userName = rootView.findViewById(R.id.textUserName);
                 userName.setText(GitHubRepo.repos[position].getOwnerName());
 
                 //  Repo Name
-                TextView repoName = view.findViewById(R.id.textRepoName);
+                TextView repoName = rootView.findViewById(R.id.textRepoName);
                 repoName.setText(GitHubRepo.repos[position].getRepoName());
 
                 //  Repo Desc
-                TextView repoDesc = view.findViewById(R.id.textRepoDesc);
+                TextView repoDesc = rootView.findViewById(R.id.textRepoDesc);
                 repoDesc.setText(GitHubRepo.repos[position].getRepoDesc());
 
                 //  Repo Url
-                TextView repoUrl = view.findViewById(R.id.textRepoUrl);
+                TextView repoUrl = rootView.findViewById(R.id.textRepoUrl);
                 repoUrl.setText(GitHubRepo.repos[position].getRepoUrl());
 
-                return view;
+                return rootView;
             }
         };
         listRepo.setAdapter(listAdapter);

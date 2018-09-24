@@ -1,9 +1,9 @@
 package ru.roskvartal.garry.githubviewerfrag.view;
 
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +27,7 @@ public class RepoDetailFragment extends Fragment {
     private int repoID;                                                         //  ID передается из активности.
 
 
-    //  Метод для установки нового значения repoId, вызывается из DetailActivity.
+    //  Метод для установки нового значения repoID, вызывается из DetailActivity.
     public void setRepoId(int repoID) {
         this.repoID = repoID;
     }
@@ -39,8 +39,8 @@ public class RepoDetailFragment extends Fragment {
 
 
     //  Используется для инициализации фрагмента.
-    //  ACHTUNG!!! Т.к. инициализация фрагмента RepoDetailFragment ЗАВИСИТ от параметра repoId и
-    //  метод setCategoryId() вызывается владельцем Фрагмента только после создания фрагмента,
+    //  ACHTUNG!!! Т.к. инициализация фрагмента RepoDetailFragment ЗАВИСИТ от параметра repoID и
+    //  метод setRepoId() вызывается владельцем Фрагмента только после создания фрагмента,
     //  то всю инициализацию надо выполнить в обработчике onStart()!
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
@@ -56,7 +56,7 @@ public class RepoDetailFragment extends Fragment {
 
 
     //  Вызывается после onCreate() активности и перед тем, как фрагмент становится видимым.
-    //  Параметр repoId уже установлен методом setRepoId() в обработчике onCreate() активности!
+    //  Параметр repoID уже установлен методом setRepoId() в обработчике onCreate() активности!
     @Override
     public void onStart() {
         super.onStart();
@@ -83,6 +83,17 @@ public class RepoDetailFragment extends Fragment {
         //  Repo Issues Count
         TextView repoIssues = rootView.findViewById(R.id.textRepoIssues);
         repoIssues.setText(String.valueOf(GitHubRepo.repos[repoID].getIssuesCount()));
+
+
+        //  Отображение встроенного СТАТИЧЕСКОГО <fragment> RepoMainInfoFragment для вывода основной
+        //  информации о репозитории с использованием макета от элемента списка row_list_repo.xml.
+        FragmentManager childFragmentManager = getChildFragmentManager();
+        RepoMainInfoFragment fragmentRepoMainInfo =
+                (RepoMainInfoFragment) childFragmentManager.findFragmentById(R.id.fragmentRepoMainInfo);
+
+        //  Передаем repoID вложенному фрагменту, он заполнит свои представления правильным контентом.
+        fragmentRepoMainInfo.setRepoId(repoID);
+
     }
 
 
