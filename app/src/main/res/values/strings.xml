@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">GitHubViewerFrag</string>
     <string name="app_label">Просмотр репозиториев в GitHub</string>
-    <string name="app_copyright">Автор: Сафронов Юрий, garry1301@mail.ru</string>
+    <string name="app_copyright">Автор: Юрий Сафронов, garry1301@mail.ru</string>
     <string name="list_label">Список репозиториев</string>
     <string name="detail_label">Детальная информация</string>
     <string name="img_logo_desc">Логотип GitHub</string>
     <string name="user_name_hint">Введите имя пользователя</string>
     <string name="btn_enter_desc">Поиск</string>
     <string name="img_avatar_desc">Аватар пользователя</string>
-    <string name="empty_string"></string>
+
 </resources>

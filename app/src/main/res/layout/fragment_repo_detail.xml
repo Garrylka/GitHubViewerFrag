@@ -1,0 +1,76 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/layout_padding"
+    tools:context="ru.roskvartal.garry.githubviewerfrag.view.RepoDetailFragment">
+<!--
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        class="ru.roskvartal.garry.githubviewerfrag.view.RepoMainInfoFragment"
+        android:id="@+id/fragmentRepoDetail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+-->
+    <TextView
+        android:id="@+id/textRepoLang"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_lang_vec"
+        android:drawableStart="@drawable/octicon_lang_vec"
+        android:drawablePadding="@dimen/icon_border_padding"
+        android:background="@drawable/text_border" />
+
+    <TextView
+        android:id="@+id/textRepoStars"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_star_vec"
+        android:drawableStart="@drawable/octicon_star_vec"
+        android:drawablePadding="@dimen/icon_border_padding"
+        android:background="@drawable/text_border" />
+
+    <TextView
+        android:id="@+id/textRepoWatchers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_eye_vec"
+        android:drawableStart="@drawable/octicon_eye_vec"
+        android:drawablePadding="@dimen/icon_border_padding"
+        android:background="@drawable/text_border" />
+
+    <TextView
+        android:id="@+id/textRepoForks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_fork_vec"
+        android:drawableStart="@drawable/octicon_fork_vec"
+        android:drawablePadding="@dimen/icon_border_padding"
+        android:background="@drawable/text_border" />
+
+    <TextView
+        android:id="@+id/textRepoIssues"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center_vertical"
+        android:drawableLeft="@drawable/octicon_issue_vec"
+        android:drawableStart="@drawable/octicon_issue_vec"
+        android:drawablePadding="@dimen/icon_border_padding"
+        android:background="@drawable/text_border" />
+
+</LinearLayout>

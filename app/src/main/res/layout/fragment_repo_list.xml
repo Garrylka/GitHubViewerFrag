@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-    Fragment RepoListFragment: Используется для любых устройств и любых режимов экрана.
+    RepoListFragment: Используется в для любых устройств и любых режимов экрана.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -81,4 +81,5 @@
         android:layout_marginTop="@dimen/margin_vertical"
         android:textColor="@color/color_app_logo_text"
         android:background="@drawable/text_border" />
+
 </LinearLayout>

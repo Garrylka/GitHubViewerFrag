@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -21,12 +22,7 @@ import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link RepoListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link RepoListFragment#newInstance} factory method to
- * create an instance of this fragment.
+ *  Фрагмент RepoListFragment, в котором спрятан Master GUI, взаимодействует с MainActivity.
  */
 public class RepoListFragment extends Fragment {
 
@@ -35,34 +31,20 @@ public class RepoListFragment extends Fragment {
     private static final String ERR_MUST_USER = "Укажите имя пользователя GitHub!";
 
     private static final String ARG_USER_NAME = "USER_NAME";
-    private static final String ARG_REPO_ID   = "REPO_ID";
 
     private String   userName;
-    private int      repoID;
     private Context  listener;                                                  //  Слушатель - Активность.
+
 
     public RepoListFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Пока пусть сохраняются userName и repoID!
-     * @param userName Имя пользователя GitHub.
-     * @param repoID ID репозитория.
-     * @return Новый экземпляр RepoListFragment.
-     */
-     public static RepoListFragment newInstance(String userName, int repoID) {
-        RepoListFragment fragment = new RepoListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_USER_NAME, userName);
-        args.putInt(ARG_REPO_ID, repoID);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         if (context instanceof OnFragmentInteractionListener) {
             listener = context;
         } else {
@@ -70,30 +52,28 @@ public class RepoListFragment extends Fragment {
         }
     }
 
-    //  Пока пусть сохраняются userName и repoID!
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            userName = getArguments().getString(ARG_USER_NAME);
-            repoID   = getArguments().getInt(ARG_REPO_ID);
-        }
-    }
 
     //  Используется для инициализации Фрагмента.
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedState) {
 
-        // Inflate the layout for this fragment.
+        //  Восстановление данных при повороте экрана.
+        if (savedState != null) {
+            userName = savedState.getString(ARG_USER_NAME);
+        }
+
+        //  OLD Inflate the layout for this fragment.
         //return inflater.inflate(R.layout.fragment_repo_list, container, false);
 
         //  Получение корневого объекта View Фрагмента. Теперь можно использовать метод findViewById().
         View rootView = inflater.inflate(R.layout.fragment_repo_list, container, false);
 
+
         //  Получаем ссылки на GUI элементы.
         //  И назначаем обработчики.
-        final EditText editUserName = (EditText) rootView.findViewById(R.id.editUserName);
-        ImageButton btnEnter = (ImageButton) rootView.findViewById(R.id.btnEnter);
+        final EditText editUserName = rootView.findViewById(R.id.editUserName);
+        ImageButton btnEnter = rootView.findViewById(R.id.btnEnter);
+
 
         //  Обработчик нажатия кнопки Enter.
         View.OnClickListener clickListener = new View.OnClickListener() {
@@ -115,7 +95,7 @@ public class RepoListFragment extends Fragment {
 
         //  Работа со списком:
         //  Назначение адаптера для вывода строк.
-        ListView listRepo = (ListView) rootView.findViewById(R.id.listRepo);
+        ListView listRepo = rootView.findViewById(R.id.listRepo);
 
         //  TEST Пока просто выводим String из массива при onCreateView.
         //  Потом этот код будет в другом событии (и возможно с разными row_list_repos.xml).
@@ -123,6 +103,7 @@ public class RepoListFragment extends Fragment {
         //    listener,
         //    android.R.layout.simple_list_item_1,
         //    GitHubRepo.repos);
+
 
         //  NEW ListView с иконками (указал свой row_list_repo макет).
         ArrayAdapter<GitHubRepo> listAdapter = new ArrayAdapter<GitHubRepo>(
@@ -137,33 +118,54 @@ public class RepoListFragment extends Fragment {
                 View view = super.getView(position, convertView, parent);
 
                 //  User Avatar
-                ImageView userAvatar = (ImageView) view.findViewById(R.id.imgUserAvatar);
+                ImageView userAvatar = view.findViewById(R.id.imgUserAvatar);
                 userAvatar.setImageResource(GitHubRepo.repos[position].getOwnerAvatarId());
 
                 //  User Name
-                TextView userName = (TextView) view.findViewById(R.id.textUserName);
+                TextView userName = view.findViewById(R.id.textUserName);
                 userName.setText(GitHubRepo.repos[position].getOwnerName());
 
                 //  Repo Name
-                TextView repoName = (TextView) view.findViewById(R.id.textRepoName);
+                TextView repoName = view.findViewById(R.id.textRepoName);
                 repoName.setText(GitHubRepo.repos[position].getRepoName());
 
                 //  Repo Desc
-                TextView repoDesc = (TextView) view.findViewById(R.id.textRepoDesc);
+                TextView repoDesc = view.findViewById(R.id.textRepoDesc);
                 repoDesc.setText(GitHubRepo.repos[position].getRepoDesc());
 
                 //  Repo Url
-                TextView repoUrl = (TextView) view.findViewById(R.id.textRepoUrl);
+                TextView repoUrl = view.findViewById(R.id.textRepoUrl);
                 repoUrl.setText(GitHubRepo.repos[position].getRepoUrl());
-
 
                 return view;
             }
         };
         listRepo.setAdapter(listAdapter);
 
+
+        //  Обработчик нажатия на элемент списка.
+        //  Вызывает callback метод onRepoListItemClicked() в активности.
+        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                ((OnFragmentInteractionListener) listener).onRepoListItemClicked((int) id);
+            }
+        };
+        listRepo.setOnItemClickListener(itemClickListener);
+
         return rootView;
     }
+
+
+    //  Сохранение состояния Фрагмента перед уничтожением.
+    @Override
+    public void onSaveInstanceState(Bundle saveState) {
+        saveState.putString(ARG_USER_NAME, userName);
+        super.onSaveInstanceState(saveState);
+    }
+
 
     @Override
     public void onDetach() {
@@ -171,16 +173,10 @@ public class RepoListFragment extends Fragment {
         listener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
+    //  Интерфейс с методом обратного вызова для развязки Фрагмента и Активности
+    //  при обработке клика на пункте ListView.
+    //  Активность автоматически подписывается в событии onAttach() Фрагмента.
     public interface OnFragmentInteractionListener {
         void onRepoListItemClicked(int repoID);
     }

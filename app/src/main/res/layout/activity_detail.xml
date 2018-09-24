@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    DetailActivity: Используется по умолчанию для Смартфонов в любом режиме экрана.
+    Надувается фрагментом RepoDetailFragment с основной и детальной информацией о репозитории.
+-->
+
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    class="ru.roskvartal.garry.githubviewerfrag.view.RepoDetailFragment"
+    android:id="@+id/fragmentRepoDetail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.DetailActivity" />
