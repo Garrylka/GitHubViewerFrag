@@ -12,7 +12,7 @@ import ru.roskvartal.garry.githubviewerfrag.R;
  *  MainActivity взаимодействует с фрагментом RepoListFragment, в котором спрятан Master GUI.
  */
 public class MainActivity extends AppCompatActivity
-        implements RepoListFragment.OnFragmentInteractionListener {
+        implements RepoLCEFragment.OnFragmentInteractionListener {
 
     private static final String LOGCAT_TAG = "MAIN";                            //  DEBUG
 

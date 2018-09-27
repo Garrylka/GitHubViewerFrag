@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    RepoLCEFragment:
+        Используется для любых устройств и любых режимов экрана.
+        Содержит элементы LCE.
+        Использует: RecyclerView с SwipeRefreshLayout.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/layout_padding"
+    tools:context="ru.roskvartal.garry.githubviewerfrag.view.RepoLCEFragment">
+
+    <!-- Лого приложения -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/github_logo"
+        android:contentDescription="@string/img_logo_desc"
+        android:background="@drawable/text_border" />
+
+    <!-- Список перозиториев -->
+<!--
+    <ProgressBar
+        android:id="@id/loadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"/>
+-->
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:background="@drawable/text_border" >
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listRepo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+<!--
+    <TextView
+        android:id="@id/errorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+-->
+
+    <!-- Copyright -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/app_copyright"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginTop="@dimen/margin_vertical"
+        android:textColor="@color/color_app_logo_text"
+        android:background="@drawable/text_border" />
+
+</LinearLayout>

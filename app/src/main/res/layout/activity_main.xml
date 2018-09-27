@@ -10,7 +10,7 @@
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    class="ru.roskvartal.garry.githubviewerfrag.view.RepoListFragment"
+    class="ru.roskvartal.garry.githubviewerfrag.view.RepoLCEFragment"
     android:id="@+id/fragmentRepoList"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
