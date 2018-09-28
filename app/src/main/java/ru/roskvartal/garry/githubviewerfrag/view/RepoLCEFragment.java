@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,27 +12,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hannesdorfmann.mosby3.mvp.MvpFragment;
+
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
-import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
 import ru.roskvartal.garry.githubviewerfrag.model.RepoModelImpl;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenter;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 
 /**
- *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI, взаимодействует с MainActivity.
+ *  Переход на Mosby MVP.
+ *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI,
+ *  взаимодействует с MainActivity.
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
  *  + Заготовки view для LCE (loadingView, errorView - пока отключены).
  */
-public class RepoLCEFragment extends Fragment implements ReposView {
+public class RepoLCEFragment extends MvpFragment<ReposView, ReposPresenter> implements ReposView {
 
     private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
     private static final String ERR_MUST_IMPL = " должен реализовать RepoLCEFragment.OnFragmentInteractionListener";
 
     private Context listener;                                                   //  Слушатель - Активность.
-
-    private ReposPresenter presenter;
 
     private SwipeRefreshLayout swipeRefresh;
 
@@ -54,6 +54,13 @@ public class RepoLCEFragment extends Fragment implements ReposView {
     }
 
 
+    @NonNull
+    @Override
+    public ReposPresenter createPresenter() {
+        return new ReposPresenterImpl(new RepoModelImpl());
+    }
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -63,17 +70,6 @@ public class RepoLCEFragment extends Fragment implements ReposView {
         } else {
             throw new RuntimeException(context.toString() + ERR_MUST_IMPL);
         }
-    }
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        listAdapter = new RepoRecyclerViewAdapter();
-
-        RepoModel model = new RepoModelImpl();
-        presenter = new ReposPresenterImpl(model);
     }
 
 
@@ -88,13 +84,8 @@ public class RepoLCEFragment extends Fragment implements ReposView {
         //  Работа с SwipeRefresh.
         swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
 
-        SwipeRefreshLayout.OnRefreshListener refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                //  TODO: Повторный запрос и вывод данных в список.
-                loadData();
-            }
-        };
+        //  Обработчик свайпа: Повторный запрос и вывод данных в список.
+        SwipeRefreshLayout.OnRefreshListener refreshListener = () -> loadData();
         swipeRefresh.setOnRefreshListener(refreshListener);
 
 
@@ -109,19 +100,13 @@ public class RepoLCEFragment extends Fragment implements ReposView {
         listRepo.setHasFixedSize(true);
 
         //  Назначение адаптера для вывода строк.
+        listAdapter = new RepoRecyclerViewAdapter();
         listRepo.setAdapter(listAdapter);
 
         //  Обработчик нажатия на элементе списка.
         //  Вызывает callback метод onRepoListItemClicked() в активности.
         RepoRecyclerViewAdapter.OnItemClickListener itemClickListener =
-                new RepoRecyclerViewAdapter.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(View view, int position) {
-
-                ((OnFragmentInteractionListener) listener).onRepoListItemClicked(position);
-            }
-        };
+                (view, position) -> ((OnFragmentInteractionListener) listener).onRepoListItemClicked(position);
         listAdapter.setOnItemClickListener(itemClickListener);
 
         //  Добавление разделителя между элементами списка.
@@ -154,7 +139,7 @@ public class RepoLCEFragment extends Fragment implements ReposView {
     //  В этом простом случае из модели в представление просто передается ссылка на тестовый массив repos.
     //  Параметр this т.к. фрагмент implements ReposView и метод setRepos() описан ниже.
     public void loadData() {
-        presenter.loadRepos(this);
+        presenter.loadRepos();
     }
 
 
@@ -170,6 +155,5 @@ public class RepoLCEFragment extends Fragment implements ReposView {
     public void showContent() {
         swipeRefresh.setRefreshing(false);
     }
-
 
 }
