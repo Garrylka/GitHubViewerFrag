@@ -11,32 +11,35 @@ import android.widget.TextView;
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
+
 /**
  *  Собственный класс Адаптера для RecyclerView.
  */
 public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerViewAdapter.RepoViewHolder> {
 
-    //  TEST Модель данных.
+    //  Ссылка на данные.
     private GitHubRepo[] repos;
 
-    //  Слушатель нажатий на элементе списка.
+    //  Слушатель клика на элементе списка.
     private OnItemClickListener listener;
+
 
 
     //  Интерфейс с методом обратного вызова для обработки клика на элементе списка.
     public interface OnItemClickListener {
+
         void onItemClick(View itemView, int position);
     }
 
 
-    //  Устанавливает слушателя нажатий на элементе списка.
+    //  Установка слушателя.
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
 
-    //  В конструктор передаем ссылку на наш набор данных.
-    public RepoRecyclerViewAdapter(GitHubRepo[] repos) {
+    //  Установка ссылки на данные.
+    public void setRepos(GitHubRepo[] repos) {
         this.repos = repos;
     }
 
@@ -89,7 +92,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     }
 
 
-    //  Создание новых view (вызывается layout manager-ом).
+    //  Создание новых ViewHolder (вызывается layout manager-ом).
     @NonNull
     @Override
     public RepoRecyclerViewAdapter.RepoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -126,4 +129,5 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     public int getItemCount() {
         return repos.length;
     }
+
 }

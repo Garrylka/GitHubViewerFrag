@@ -3,6 +3,7 @@ package ru.roskvartal.garry.githubviewerfrag.view;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -14,6 +15,10 @@ import android.view.ViewGroup;
 
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
+import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
+import ru.roskvartal.garry.githubviewerfrag.model.RepoModelImpl;
+import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenter;
+import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 
 /**
@@ -21,12 +26,27 @@ import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
  *  + Заготовки view для LCE (loadingView, errorView - пока отключены).
  */
-public class RepoLCEFragment extends Fragment  {
+public class RepoLCEFragment extends Fragment implements ReposView {
 
     private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
     private static final String ERR_MUST_IMPL = " должен реализовать RepoLCEFragment.OnFragmentInteractionListener";
 
-    private Context listener;                                                  //  Слушатель - Активность.
+    private Context listener;                                                   //  Слушатель - Активность.
+
+    private ReposPresenter presenter;
+
+    private SwipeRefreshLayout swipeRefresh;
+
+    private RepoRecyclerViewAdapter listAdapter;                                //  Адаптер RecyclerView.
+
+
+    //  Интерфейс с методом обратного вызова для развязки Фрагмента и Активности
+    //  при обработке клика на элементе списка.
+    //  Активность автоматически подписывается в событии onAttach() Фрагмента.
+    //  Активность должна реализовать метод этого интерфейса!
+    public interface OnFragmentInteractionListener {
+        void onRepoListItemClicked(int repoID);
+    }
 
 
     public RepoLCEFragment() {
@@ -46,52 +66,33 @@ public class RepoLCEFragment extends Fragment  {
     }
 
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        listAdapter = new RepoRecyclerViewAdapter();
+
+        RepoModel model = new RepoModelImpl();
+        presenter = new ReposPresenterImpl(model);
+    }
+
+
     //  Используется для инициализации Фрагмента.
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedState) {
-
-        //  Восстановление данных при повороте экрана.
-        //if (savedState != null) {
-        //    userName = savedState.getString(ARG_USER_NAME);
-        //}
 
         //  Получение корневого объекта View Фрагмента. Теперь можно использовать метод findViewById().
         View rootView = inflater.inflate(R.layout.fragment_repo_lce, container, false);
 
 
-        //  Получаем ссылки на GUI элементы.
-        //  И назначаем обработчики.
-        //final EditText editUserName = rootView.findViewById(R.id.editUserName);
-        //ImageButton btnEnter = rootView.findViewById(R.id.btnEnter);
-
-
-        //  Обработчик нажатия кнопки Enter.
-        //View.OnClickListener clickListener = new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View view) {
-        //        //  TEST Проверка на пустую строку.
-        //        //  Потом будет выбор: выводить все репо или по пользователю.
-        //        userName = editUserName.getText().toString().trim();
-        //        if (userName.isEmpty()) {
-        //            Toast.makeText(listener, ERR_MUST_USER, Toast.LENGTH_SHORT).show();
-        //            return;
-        //        }
-        //
-        //        //  TODO: Запрос данных пользователя с сервера GitHub и вывод в список.
-        //        Log.d(LOGCAT_TAG, "onClick(): " + userName);
-        //    }
-        //};
-        //btnEnter.setOnClickListener(clickListener);
-
-
         //  Работа с SwipeRefresh.
-        final SwipeRefreshLayout swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
+        swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
 
         SwipeRefreshLayout.OnRefreshListener refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 //  TODO: Повторный запрос и вывод данных в список.
-                swipeRefresh.setRefreshing(false);
+                loadData();
             }
         };
         swipeRefresh.setOnRefreshListener(refreshListener);
@@ -108,12 +109,12 @@ public class RepoLCEFragment extends Fragment  {
         listRepo.setHasFixedSize(true);
 
         //  Назначение адаптера для вывода строк.
-        RepoRecyclerViewAdapter listAdapter = new RepoRecyclerViewAdapter(GitHubRepo.repos);
         listRepo.setAdapter(listAdapter);
 
         //  Обработчик нажатия на элементе списка.
         //  Вызывает callback метод onRepoListItemClicked() в активности.
-        RepoRecyclerViewAdapter.OnItemClickListener itemClickListener = new RepoRecyclerViewAdapter.OnItemClickListener() {
+        RepoRecyclerViewAdapter.OnItemClickListener itemClickListener =
+                new RepoRecyclerViewAdapter.OnItemClickListener() {
 
             @Override
             public void onItemClick(View view, int position) {
@@ -133,12 +134,13 @@ public class RepoLCEFragment extends Fragment  {
     }
 
 
-    //  Сохранение состояния Фрагмента перед уничтожением.
-    //@Override
-    //public void onSaveInstanceState(Bundle saveState) {
-    //    saveState.putString(ARG_USER_NAME, userName);
-    //    super.onSaveInstanceState(saveState);
-    //}
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        //  Передача ссылки на массив repos в адаптер.
+        loadData();
+    }
 
 
     @Override
@@ -148,12 +150,26 @@ public class RepoLCEFragment extends Fragment  {
     }
 
 
-    //  Интерфейс с методом обратного вызова для развязки Фрагмента и Активности
-    //  при обработке клика на элементе списка.
-    //  Активность автоматически подписывается в событии onAttach() Фрагмента.
-    //  Активность должна реализовать метод этого интерфейса!
-    public interface OnFragmentInteractionListener {
-        void onRepoListItemClicked(int repoID);
+    //  Развязка Model и View через Presenter!
+    //  В этом простом случае из модели в представление просто передается ссылка на тестовый массив repos.
+    //  Параметр this т.к. фрагмент implements ReposView и метод setRepos() описан ниже.
+    public void loadData() {
+        presenter.loadRepos(this);
     }
+
+
+    //  Переход на MVP.
+    @Override
+    public void setRepos(GitHubRepo[] repos) {
+        listAdapter.setRepos(repos);
+        listAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void showContent() {
+        swipeRefresh.setRefreshing(false);
+    }
+
 
 }
