@@ -6,7 +6,7 @@ import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
 import ru.roskvartal.garry.githubviewerfrag.view.ReposView;
 
 
-//  Переход на Mosby MVP.
+//  Переход на Mosby MVP LCE.
 public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements ReposPresenter {
 
     private final RepoModel model;
@@ -18,9 +18,10 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
 
 
     @Override
-    public void loadRepos() {
+    public void loadRepos(final boolean pullToRefresh) {
         ifViewAttached(view -> {
-            view.setRepos(model.getRepos());
+            view.showLoading(pullToRefresh);
+            view.setData(model.getRepos());
             view.showContent();
         });
     }

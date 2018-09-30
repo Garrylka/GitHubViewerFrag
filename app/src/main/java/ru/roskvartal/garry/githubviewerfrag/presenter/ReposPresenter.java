@@ -5,8 +5,8 @@ import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 import ru.roskvartal.garry.githubviewerfrag.view.ReposView;
 
 
-//  Переход на Mosby MVP.
+//  Переход на Mosby MVP LCE.
 public interface ReposPresenter extends MvpPresenter<ReposView> {
 
-    void loadRepos();
+    void loadRepos(final boolean pullToRefresh);
 }
