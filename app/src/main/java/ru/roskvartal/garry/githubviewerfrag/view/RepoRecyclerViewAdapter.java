@@ -127,7 +127,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     //  Возвращает размер нашего набора данных (вызывается layout manager-ом).
     @Override
     public int getItemCount() {
-        return repos.length;
+        return (repos == null ? 0 : repos.length);
     }
 
 }

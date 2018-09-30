@@ -25,18 +25,21 @@ import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
  *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI,
  *  взаимодействует с MainActivity.
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
- *  + Заготовки view для LCE (loadingView, errorView - пока отключены).
  */
 public class RepoLCEFragment
-        extends MvpLceFragment<SwipeRefreshLayout, GitHubRepo[], ReposView, ReposPresenter>
+        extends MvpLceFragment<RecyclerView, GitHubRepo[], ReposView, ReposPresenter>
         implements ReposView {
 
     //private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
     private static final String ERR_MUST_IMPL = " должен реализовать RepoLCEFragment.OnFragmentInteractionListener";
+    private static final String ERR_UNKNOWN_ERR = "Неизвестная ошибка!";
 
     private Context listener;                                                   //  Слушатель - Активность.
 
     private RepoRecyclerViewAdapter listAdapter;                                //  Адаптер RecyclerView.
+
+    private SwipeRefreshLayout swipeRefresh;
+
 
 
     //  Интерфейс с методом обратного вызова для развязки Фрагмента и Активности
@@ -80,32 +83,34 @@ public class RepoLCEFragment
 
 
     //  Инициализации Фрагмента.
+    //  При использовании Mosby LCE всю инициализацию надо проводить в методе onViewCreated()!
+    //  Иначе в onCreateView() ошибка на contentView.setOnRefreshListener(refreshListener) - contentView еще не создан!
     @Override
     public void onViewCreated(View rootView, @Nullable Bundle savedInstance) {
 
         super.onViewCreated(rootView, savedInstance);
 
-        //  Работа с SwipeRefresh ( Теперь это - contentView ! ).
-        //swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
+        //  Работа с SwipeRefresh.
+        swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
 
         //  Обработчик свайпа: Повторный запрос и вывод данных в список.
         SwipeRefreshLayout.OnRefreshListener refreshListener = () -> loadData(true);
-        contentView.setOnRefreshListener(refreshListener);
+        swipeRefresh.setOnRefreshListener(refreshListener);
 
 
-        //  Работа со списком (RecyclerView).
-        RecyclerView listRepo = rootView.findViewById(R.id.listRepo);
+        //  Работа со списком RecyclerView ( Теперь это - contentView ! ).
+        //RecyclerView listRepo = rootView.findViewById(R.id.listRepo);
 
         //  Назначение Layout Manager.
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(listener);
-        listRepo.setLayoutManager(layoutManager);
+        contentView.setLayoutManager(layoutManager);
 
         //  Оптимизация.
-        listRepo.setHasFixedSize(true);
+        contentView.setHasFixedSize(true);
 
         //  Назначение адаптера для вывода строк.
         listAdapter = new RepoRecyclerViewAdapter();
-        listRepo.setAdapter(listAdapter);
+        contentView.setAdapter(listAdapter);
 
         //  Обработчик нажатия на элементе списка.
         //  Вызывает callback метод onRepoListItemClicked() в активности.
@@ -145,8 +150,12 @@ public class RepoLCEFragment
     public void loadData(boolean pullToRefresh) {
         //presenter.loadRepos(pullToRefresh);
 
-        //  TEST Тестирование ProgressBar при помощи эмуляции задержки загрузки данных.
-        presenter.loadReposDefer(pullToRefresh);
+        //  TEST Тестирование:
+        //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
+        //presenter.loadReposDefer(pullToRefresh);
+
+        //  2) Эмуляция задержки и ошибки при загрузке данных.
+        presenter.loadReposDeferError(pullToRefresh);
     }
 
 
@@ -160,27 +169,27 @@ public class RepoLCEFragment
     @Override
     public void showLoading(boolean pullToRefresh) {
         super.showLoading(pullToRefresh);
-        contentView.setRefreshing(pullToRefresh);
+        swipeRefresh.setRefreshing(pullToRefresh);
     }
 
     @Override
     public void showContent() {
         super.showContent();
-        contentView.setRefreshing(false);
+        swipeRefresh.setRefreshing(false);
     }
 
 
     @Override
     public void showError(Throwable e, boolean pullToRefresh) {
         super.showError(e, pullToRefresh);
-        contentView.setRefreshing(false);
+        swipeRefresh.setRefreshing(false);
     }
 
 
     @Override
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
-        String message = e.getMessage();
-        return (message == null ? "Unknown error!" : message);
+        String message = e.toString();
+        return (message.isEmpty() ? ERR_UNKNOWN_ERR : message);
     }
 
 }

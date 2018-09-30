@@ -4,11 +4,19 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import java.io.IOException;
+import java.util.Random;
+
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
 
 //  Переход на Mosby MVP LCE.
 public class RepoModelImpl implements RepoModel {
+
+    //  TEST: Эмуляция ошибки при загрузке данных.
+    private Random random = new Random();
+    private Throwable error = null;
+
 
     @Override
     public GitHubRepo[] getRepos() {
@@ -40,26 +48,69 @@ public class RepoModelImpl implements RepoModel {
     }
 
 
-    //  TEST Тестирование ProgressBar при помощи эмуляции задержки загрузки данных.
+    //  TEST Тестирование:
+    //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
     @SuppressLint("StaticFieldLeak")
     @Override
     public void getReposDefer(final MyTestAction<GitHubRepo[]> onNext) {
 
         new AsyncTask<Void, Void, GitHubRepo[]>() {
+
             @Override
             protected GitHubRepo[] doInBackground(Void ... params) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 return getRepos();
             }
+
             @Override
             protected void onPostExecute (GitHubRepo[] data) {
                 onNext.call(data);
             }
+
         }.execute ();
+    }
+
+    //  2) Эмуляция задержки и ошибки при загрузке данных.
+    @SuppressLint("StaticFieldLeak")
+    @Override
+    public void getReposDeferError(final MyTestAction<GitHubRepo[]> onNext) {
+
+        new AsyncTask<Void, Void, GitHubRepo[]>() {
+
+            @Override
+            protected GitHubRepo[] doInBackground(Void ... params) {
+                try {
+                    Thread.sleep(2000);
+
+                    //  TEST: Эмуляция ошибки при загрузке данных.
+                    if (random.nextBoolean()) {
+                        throw new IOException();
+                    }
+                } catch (InterruptedException | IOException e) {
+                    //e.printStackTrace();
+                    //  TEST: Эмуляция ошибки при загрузке данных.
+                    error = e;
+                    return null;
+                }
+                return getRepos();
+            }
+
+            @Override
+            protected void onPostExecute (GitHubRepo[] data) {
+                onNext.call(data);
+            }
+
+        }.execute ();
+    }
+
+
+    @Override
+    public Throwable getError() {
+        return error;
     }
 
 }

@@ -23,8 +23,7 @@
         android:contentDescription="@string/img_logo_desc"
         android:background="@drawable/text_border" />
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -41,25 +40,32 @@
 
         <!-- Content View -->
         <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@id/contentView"
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Список перозиториев -->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/listRepo"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
+
+                <!-- Список перозиториев -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@id/contentView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <!-- Error view -->
+                <TextView
+                    android:id="@id/errorView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center" />
+
+            </FrameLayout>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <!-- Error view -->
-        <TextView
-            android:id="@id/errorView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
+    </FrameLayout>
 
     <!-- Copyright -->
     <TextView

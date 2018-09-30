@@ -14,6 +14,12 @@ public interface RepoModel {
 
     int getReposCount();
 
-    //  TEST Тестирование ProgressBar при помощи эмуляции задержки загрузки данных.
+    //  TEST Тестирование:
+    //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
     void getReposDefer(final MyTestAction<GitHubRepo[]> onNext);
+
+    //  2) Эмуляция ошибки при загрузке данных.
+    void getReposDeferError(final MyTestAction<GitHubRepo[]> onNext);
+
+    Throwable getError();
 }

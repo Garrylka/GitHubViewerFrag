@@ -2,8 +2,6 @@ package ru.roskvartal.garry.githubviewerfrag.presenter;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
-import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
-import ru.roskvartal.garry.githubviewerfrag.model.MyTestAction;
 import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
 import ru.roskvartal.garry.githubviewerfrag.view.ReposView;
 
@@ -29,15 +27,36 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
     }
 
 
-    //  TEST Тестирование ProgressBar при помощи эмуляции задержки загрузки данных.
+    //  TEST Тестирование:
+    //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
     @Override
-    public void loadReposDefer(boolean pullToRefresh) {
+    public void loadReposDefer(final boolean pullToRefresh) {
 
         ifViewAttached(view -> view.showLoading(pullToRefresh));
 
-        model.getReposDefer(data -> ifViewAttached(view -> {
-            view.setData(data);
-            view.showContent();
-        }));
+        model.getReposDefer(data -> {
+            ifViewAttached(view -> {
+                view.setData(data);
+                view.showContent();
+            });
+        });
+    }
+
+    //  2) Эмуляция задержки и ошибки при загрузке данных.
+    @Override
+    public void loadReposDeferError(final boolean pullToRefresh) {
+
+        ifViewAttached(view -> view.showLoading(pullToRefresh));
+
+        model.getReposDeferError(data -> {
+            if (data != null) {
+                ifViewAttached(view -> {
+                    view.setData(data);
+                    view.showContent();
+                });
+            } else {
+                ifViewAttached(view -> view.showError(model.getError(), pullToRefresh));
+            }
+        });
     }
 }
