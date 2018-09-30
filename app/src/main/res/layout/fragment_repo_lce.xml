@@ -23,38 +23,43 @@
         android:contentDescription="@string/img_logo_desc"
         android:background="@drawable/text_border" />
 
-
-    <!-- Loading View -->
-    <ProgressBar
-        android:id="@id/loadingView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:indeterminate="true" />
-
-    <!-- Content View -->
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@id/contentView"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="@dimen/margin_vertical"
-        android:background="@drawable/text_border" >
+        android:background="@drawable/text_border">
 
-        <!-- Список перозиториев -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/listRepo"
+        <!-- Loading View -->
+        <ProgressBar
+            android:id="@id/loadingView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+
+        <!-- Content View -->
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@id/contentView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+            <!-- Список перозиториев -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listRepo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-    <!-- Error view -->
-    <TextView
-        android:id="@id/errorView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        </android.support.v4.widget.SwipeRefreshLayout>
 
+        <!-- Error view -->
+        <TextView
+            android:id="@id/errorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
     <!-- Copyright -->
     <TextView

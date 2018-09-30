@@ -143,7 +143,10 @@ public class RepoLCEFragment
     //  В этом простом случае из модели в представление просто передается ссылка на тестовый массив repos.
     @Override
     public void loadData(boolean pullToRefresh) {
-        presenter.loadRepos(pullToRefresh);
+        //presenter.loadRepos(pullToRefresh);
+
+        //  TEST Тестирование ProgressBar при помощи эмуляции задержки загрузки данных.
+        presenter.loadReposDefer(pullToRefresh);
     }
 
 
