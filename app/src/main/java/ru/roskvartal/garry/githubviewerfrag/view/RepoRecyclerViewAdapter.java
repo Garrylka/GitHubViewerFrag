@@ -44,6 +44,12 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     }
 
 
+    //  Для перехода на Mosby MVP LCE ViewState.
+    public GitHubRepo[] getRepos() {
+        return repos;
+    }
+
+
     //  Предоставляет ссылки ко всем view элемента списка (row).
     public class RepoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 

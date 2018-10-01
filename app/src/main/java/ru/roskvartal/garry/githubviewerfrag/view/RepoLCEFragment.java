@@ -11,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.hannesdorfmann.mosby3.mvp.lce.MvpLceFragment;
+import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
+import com.hannesdorfmann.mosby3.mvp.viewstate.lce.MvpLceViewStateFragment;
+import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.RetainingLceViewState;
 
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
@@ -21,13 +23,13 @@ import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 
 /**
- *  Переход на Mosby MVP LCE.
+ *  Переход на Mosby MVP LCE ViewState.
  *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI,
  *  взаимодействует с MainActivity.
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
  */
 public class RepoLCEFragment
-        extends MvpLceFragment<RecyclerView, GitHubRepo[], ReposView, ReposPresenter>
+        extends MvpLceViewStateFragment<RecyclerView, GitHubRepo[], ReposView, ReposPresenter>
         implements ReposView {
 
     //private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
@@ -72,6 +74,15 @@ public class RepoLCEFragment
         } else {
             throw new RuntimeException(context.toString() + ERR_MUST_IMPL);
         }
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //  Переход на Mosby MVP LCE ViewState.
+        setRetainInstance(true);
     }
 
 
@@ -126,7 +137,8 @@ public class RepoLCEFragment
 
 
         //  LCE!
-        loadData(false);
+        //  Переход на Mosby MVP LCE ViewState.
+        //loadData(false);
     }
 
 
@@ -172,6 +184,7 @@ public class RepoLCEFragment
         swipeRefresh.setRefreshing(pullToRefresh);
     }
 
+
     @Override
     public void showContent() {
         super.showContent();
@@ -190,6 +203,20 @@ public class RepoLCEFragment
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
         String message = e.toString();
         return (message.isEmpty() ? ERR_UNKNOWN_ERR : message);
+    }
+
+
+    //  Переход на Mosby MVP LCE ViewState.
+    @NonNull
+    @Override
+    public LceViewState<GitHubRepo[], ReposView> createViewState() {
+        return new RetainingLceViewState<>();
+    }
+
+
+    @Override
+    public GitHubRepo[] getData() {
+        return (listAdapter == null ? null : listAdapter.getRepos());
     }
 
 }

@@ -34,12 +34,11 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
 
         ifViewAttached(view -> view.showLoading(pullToRefresh));
 
-        model.getReposDefer(data -> {
-            ifViewAttached(view -> {
+        model.getReposDefer(data -> ifViewAttached(view -> {
                 view.setData(data);
                 view.showContent();
-            });
-        });
+            })
+        );
     }
 
     //  2) Эмуляция задержки и ошибки при загрузке данных.
