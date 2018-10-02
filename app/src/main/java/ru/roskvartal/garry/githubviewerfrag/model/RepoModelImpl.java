@@ -104,7 +104,7 @@ public class RepoModelImpl implements RepoModel {
                 onNext.call(data);
             }
 
-        }.execute ();
+        }.execute();
     }
 
 
@@ -113,4 +113,47 @@ public class RepoModelImpl implements RepoModel {
         return error;
     }
 
+
+    //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
+    //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
+    @SuppressLint("StaticFieldLeak")
+    @Override
+    public void getReposDeferError2(
+            MyTestAction<GitHubRepo[]> onNext, MyTestAction<Exception> onError) {
+
+        new AsyncTask<Void, Void, GitHubRepo[]>() {
+
+            private Exception exception ;
+
+            @Override
+            protected GitHubRepo[] doInBackground(Void ... params) {
+                try {
+                    Thread.sleep(2000);
+
+                    //  TEST: Эмуляция ошибки при загрузке данных.
+                    if (Math.random() > 0.5) {
+                        throw new IOException();
+                    }
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                    //  TEST: Эмуляция ошибки при загрузке данных.
+                    exception = e;
+                    return null;
+                }
+                return getRepos();
+            }
+
+            @Override
+            protected void onPostExecute (GitHubRepo[] data) {
+                if (exception != null) {
+                    onError.call(exception);
+                } else {
+                    onNext.call(data);
+                }
+            }
+
+        }.execute ();
+    }
+
 }
+

@@ -167,7 +167,11 @@ public class RepoLCEFragment
         //presenter.loadReposDefer(pullToRefresh);
 
         //  2) Эмуляция задержки и ошибки при загрузке данных.
-        presenter.loadReposDeferError(pullToRefresh);
+        //presenter.loadReposDeferError(pullToRefresh);
+
+        //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
+        //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
+        presenter.loadReposDeferError2(pullToRefresh);
     }
 
 

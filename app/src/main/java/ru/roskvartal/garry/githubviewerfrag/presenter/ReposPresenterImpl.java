@@ -2,6 +2,8 @@ package ru.roskvartal.garry.githubviewerfrag.presenter;
 
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
+import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
+import ru.roskvartal.garry.githubviewerfrag.model.MyTestAction;
 import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
 import ru.roskvartal.garry.githubviewerfrag.view.ReposView;
 
@@ -41,6 +43,7 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
         );
     }
 
+
     //  2) Эмуляция задержки и ошибки при загрузке данных.
     @Override
     public void loadReposDeferError(final boolean pullToRefresh) {
@@ -55,6 +58,29 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
                 });
             } else {
                 ifViewAttached(view -> view.showError(model.getError(), pullToRefresh));
+            }
+        });
+    }
+
+
+    //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
+    //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
+    public void loadReposDeferError2(final boolean pullToRefresh) {
+
+        ifViewAttached(view -> view.showLoading(pullToRefresh));
+
+        model.getReposDeferError2(new MyTestAction<GitHubRepo[]>() {
+            @Override
+            public void call(GitHubRepo[] data) {
+                ifViewAttached(view -> {
+                    view.setData(data);
+                    view.showContent();
+                });
+            }
+        }, new MyTestAction<Exception>() {
+            @Override
+            public void call(Exception e) {
+                ifViewAttached(view -> view.showError(e, pullToRefresh));
             }
         });
     }

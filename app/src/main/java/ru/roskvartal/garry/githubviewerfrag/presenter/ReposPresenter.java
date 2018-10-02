@@ -16,4 +16,8 @@ public interface ReposPresenter extends MvpPresenter<ReposView> {
 
     //  2) Эмуляция задержки и ошибки при загрузке данных.
     void loadReposDeferError(final boolean pullToRefresh);
+
+    //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
+    //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
+    void loadReposDeferError2(final boolean pullToRefresh);
 }
