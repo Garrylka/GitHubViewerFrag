@@ -15,6 +15,9 @@ import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.MvpLceViewStateFragment;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.RetainingLceViewState;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 import ru.roskvartal.garry.githubviewerfrag.model.RepoModelImpl;
@@ -24,6 +27,7 @@ import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 /**
  *  Переход на Mosby MVP LCE ViewState.
+ *  Переход на ButterKnife.
  *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI,
  *  взаимодействует с MainActivity.
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
@@ -33,14 +37,17 @@ public class RepoLCEFragment
         implements ReposView {
 
     //private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
-    private static final String ERR_MUST_IMPL = " должен реализовать RepoLCEFragment.OnFragmentInteractionListener";
+    private static final String ERR_MUST_IMPL = " должен реализовать RepoLCEFragment.OnRepoListFragmentListener";
     private static final String ERR_UNKNOWN_ERR = "Неизвестная ошибка!";
 
     private Context listener;                                                   //  Слушатель - Активность.
 
     private RepoRecyclerViewAdapter listAdapter;                                //  Адаптер RecyclerView.
 
-    private SwipeRefreshLayout swipeRefresh;
+    //  ButterKnife.
+    @BindView(R.id.swipeRefresh) SwipeRefreshLayout swipeRefresh;
+
+    private Unbinder unbinder;
 
 
 
@@ -48,7 +55,7 @@ public class RepoLCEFragment
     //  при обработке клика на элементе списка.
     //  Активность автоматически подписывается в событии onAttach() Фрагмента.
     //  Активность должна реализовать метод этого интерфейса!
-    public interface OnFragmentInteractionListener {
+    public interface OnRepoListFragmentListener {
         void onRepoListItemClicked(int repoID);
     }
 
@@ -69,7 +76,7 @@ public class RepoLCEFragment
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof OnFragmentInteractionListener) {
+        if (context instanceof OnRepoListFragmentListener) {
             listener = context;
         } else {
             throw new RuntimeException(context.toString() + ERR_MUST_IMPL);
@@ -101,8 +108,12 @@ public class RepoLCEFragment
 
         super.onViewCreated(rootView, savedInstance);
 
+        //  ButterKnife
+        unbinder = ButterKnife.bind(this, rootView);
+
+
         //  Работа с SwipeRefresh.
-        swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
+        //ButterKnife - swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
 
         //  Обработчик свайпа: Повторный запрос и вывод данных в список.
         SwipeRefreshLayout.OnRefreshListener refreshListener = () -> loadData(true);
@@ -110,7 +121,7 @@ public class RepoLCEFragment
 
 
         //  Работа со списком RecyclerView ( Теперь это - contentView ! ).
-        //RecyclerView listRepo = rootView.findViewById(R.id.listRepo);
+        //contentView - RecyclerView listRepo = rootView.findViewById(R.id.listRepo);
 
         //  Назначение Layout Manager.
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(listener);
@@ -121,13 +132,13 @@ public class RepoLCEFragment
 
         //  Назначение адаптера для вывода строк.
         listAdapter = new RepoRecyclerViewAdapter();
-        contentView.setAdapter(listAdapter);
 
         //  Обработчик нажатия на элементе списка.
         //  Вызывает callback метод onRepoListItemClicked() в активности.
         RepoRecyclerViewAdapter.OnItemClickListener itemClickListener =
-                (view, position) -> ((OnFragmentInteractionListener) listener).onRepoListItemClicked(position);
+                (view, position) -> ((OnRepoListFragmentListener) listener).onRepoListItemClicked(position);
         listAdapter.setOnItemClickListener(itemClickListener);
+        contentView.setAdapter(listAdapter);
 
         //  Добавление разделителя между элементами списка.
         //  У меня уже используется окантовка вокруг item в макете.
@@ -146,6 +157,14 @@ public class RepoLCEFragment
     public void onDetach() {
         super.onDetach();
         listener = null;
+    }
+
+
+    //  ButterKnife. Set the views to null.
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
 

@@ -2,6 +2,7 @@ package ru.roskvartal.garry.githubviewerfrag.view;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
@@ -17,12 +21,28 @@ import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
  *  Вложенный фрагмент RepoMainInfoFragment встраивается в макет фрагмента RepoDetailFragment для
  *  вывода основной информации о репозитории с использованием макета от элемента списка row_list_repo.xml.
  *  Повторное использование макета row_list_repo.xml !
+ *  Переход на ButterKnife.
  */
 public class RepoMainInfoFragment extends Fragment {
 
     private static final String LOGCAT_TAG  = "DETAIL";                         //  DEBUG
 
     private int repoID;                                                         //  ID передается из владельца.
+
+    //  ButterKnife.
+    //  User Avatar
+    @BindView(R.id.imgUserAvatar) ImageView userAvatar;
+    //  User Name
+    @BindView(R.id.textUserName) TextView userName;
+    //  Repo Name
+    @BindView(R.id.textRepoName) TextView repoName;
+    //  Repo Desc
+    @BindView(R.id.textRepoDesc) TextView repoDesc;
+    //  Repo Url
+    @BindView(R.id.textRepoUrl) TextView repoUrl;
+
+    private Unbinder unbinder;
+
 
 
     //  Метод для установки нового значения repoID, вызывается из DetailActivity.
@@ -32,7 +52,7 @@ public class RepoMainInfoFragment extends Fragment {
 
 
     public RepoMainInfoFragment() {
-        // Required empty public constructor
+        //  Required empty public constructor
     }
 
 
@@ -41,15 +61,20 @@ public class RepoMainInfoFragment extends Fragment {
     //  метод setRepoId() вызывается владельцем Фрагмента только после создания фрагмента,
     //  то всю инициализацию надо выполнить в обработчике onStart()!
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedState) {
 
         //  Восстановление данных при повороте экрана.
         if (savedState != null) {
             repoID = savedState.getInt(RepoDetailFragment.ARG_REPO_ID, 0);
         }
 
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.row_list_repo, container, false);
+        //  Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.row_list_repo, container, false);
+
+        //  ButterKnife
+        unbinder = ButterKnife.bind(this, rootView);
+
+        return rootView;
     }
 
 
@@ -60,34 +85,33 @@ public class RepoMainInfoFragment extends Fragment {
         super.onStart();
 
         //  Получение корневого объекта View фрагмента. Теперь можно использовать метод findViewById().
-        View rootView = getView();
+        //  ButterKnife - View rootView = getView();
 
         //  User Avatar
-        ImageView userAvatar = rootView.findViewById(R.id.imgUserAvatar);
         userAvatar.setImageResource(GitHubRepo.repos[repoID].getOwnerAvatarId());
-
         //  User Name
-        TextView userName = rootView.findViewById(R.id.textUserName);
         userName.setText(GitHubRepo.repos[repoID].getOwnerName());
-
         //  Repo Name
-        TextView repoName = rootView.findViewById(R.id.textRepoName);
         repoName.setText(GitHubRepo.repos[repoID].getRepoName());
-
         //  Repo Desc
-        TextView repoDesc = rootView.findViewById(R.id.textRepoDesc);
         repoDesc.setText(GitHubRepo.repos[repoID].getRepoDesc());
-
         //  Repo Url
-        TextView repoUrl = rootView.findViewById(R.id.textRepoUrl);
         repoUrl.setText(GitHubRepo.repos[repoID].getRepoUrl());
     }
 
 
     //  Сохранение состояния Фрагмента перед уничтожением.
     @Override
-    public void onSaveInstanceState(Bundle saveState) {
+    public void onSaveInstanceState(@NonNull Bundle saveState) {
         saveState.putInt(RepoDetailFragment.ARG_REPO_ID, repoID);
         super.onSaveInstanceState(saveState);
+    }
+
+
+    //  ButterKnife. Set the views to null.
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

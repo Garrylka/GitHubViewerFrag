@@ -8,12 +8,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
 
 /**
  *  Собственный класс Адаптера для RecyclerView.
+ *  Переход на ButterKnife.
  */
 public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerViewAdapter.RepoViewHolder> {
 
@@ -55,16 +58,17 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
 
         //  ViewHolder должен содержать ссылки на все View элемента списка (row).
 
+        //  ButterKnife.
         //  User Avatar
-        ImageView userAvatar;
+        @BindView(R.id.imgUserAvatar) ImageView userAvatar;
         //  User Name
-        TextView userName;
+        @BindView(R.id.textUserName) TextView userName;
         //  Repo Name
-        TextView repoName;
+        @BindView(R.id.textRepoName) TextView repoName;
         //  Repo Desc
-        TextView repoDesc;
+        @BindView(R.id.textRepoDesc) TextView repoDesc;
         //  Repo Url
-        TextView repoUrl;
+        @BindView(R.id.textRepoUrl) TextView repoUrl;
 
 
         public RepoViewHolder(View rootView) {
@@ -72,16 +76,13 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
 
             rootView.setOnClickListener(RepoViewHolder.this);
 
+            //  ButterKnife
+            ButterKnife.bind(RepoViewHolder.this, rootView);
+
+            //  Теперь привязка View делается через ButterKnife @BindView выше!
             //  User Avatar
-            userAvatar = rootView.findViewById(R.id.imgUserAvatar);
-            //  User Name
-            userName = rootView.findViewById(R.id.textUserName);
-            //  Repo Name
-            repoName = rootView.findViewById(R.id.textRepoName);
-            //  Repo Desc
-            repoDesc = rootView.findViewById(R.id.textRepoDesc);
-            //  Repo Url
-            repoUrl = rootView.findViewById(R.id.textRepoUrl);
+            //userAvatar = rootView.findViewById(R.id.imgUserAvatar);
+            //...
         }
 
 

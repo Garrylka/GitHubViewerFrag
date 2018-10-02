@@ -12,7 +12,7 @@ import ru.roskvartal.garry.githubviewerfrag.R;
  *  MainActivity взаимодействует с фрагментом RepoListFragment, в котором спрятан Master GUI.
  */
 public class MainActivity extends AppCompatActivity
-        implements RepoLCEFragment.OnFragmentInteractionListener {
+        implements RepoLCEFragment.OnRepoListFragmentListener {
 
     private static final String LOGCAT_TAG = "MAIN";                            //  DEBUG
 
@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity
     //  Обработчик клика на списке репозиториев в RepoListFragment.
     @Override
     public void onRepoListItemClicked(int repoID) {
+
         //  Запуск активности DetailActivity с дополнительной информацией о выбранном репозитории.
         //  Передаем в активность ID репозитория.
         Intent intent = new Intent(this, DetailActivity.class);

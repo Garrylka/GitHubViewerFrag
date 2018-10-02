@@ -36,6 +36,8 @@ public class DetailActivity extends AppCompatActivity {
                 (RepoDetailFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentRepoDetail);
 
         //  Передаем repoId фрагменту, он заполнит свои представления правильным контентом.
-        detailFragment.setRepoId(repoID);
+        if (detailFragment != null) {
+            detailFragment.setRepoId(repoID);
+        }
     }
 }

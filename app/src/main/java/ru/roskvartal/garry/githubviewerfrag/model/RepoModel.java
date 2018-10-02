@@ -25,6 +25,8 @@ public interface RepoModel {
 
     //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
     //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
-    public void getReposDeferError2(
+    void getReposDeferError2(
             final MyTestAction<GitHubRepo[]> onNext, final MyTestAction<Exception> onError);
+
+
 }

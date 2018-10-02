@@ -119,7 +119,7 @@ public class RepoModelImpl implements RepoModel {
     @SuppressLint("StaticFieldLeak")
     @Override
     public void getReposDeferError2(
-            MyTestAction<GitHubRepo[]> onNext, MyTestAction<Exception> onError) {
+            final MyTestAction<GitHubRepo[]> onNext, final MyTestAction<Exception> onError) {
 
         new AsyncTask<Void, Void, GitHubRepo[]>() {
 

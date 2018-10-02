@@ -2,6 +2,7 @@ package ru.roskvartal.garry.githubviewerfrag.view;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -10,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
@@ -25,6 +29,21 @@ public class RepoDetailFragment extends Fragment {
     public  static final String ARG_REPO_ID = "REPO_ID";                        //  Для Интента и сохранения состояния.
 
     private int repoID;                                                         //  ID передается из активности.
+
+    //  ButterKnife.
+    //  Repo Language
+    @BindView(R.id.textRepoLang) TextView repoLang;
+    //  Repo Stars Count
+    @BindView(R.id.textRepoStars) TextView repoStars;
+    //  Repo Watchers Count
+    @BindView(R.id.textRepoWatchers) TextView repoWatchs;
+    //  Repo Forks Count
+    @BindView(R.id.textRepoForks) TextView repoForks;
+    //  Repo Issues Count
+    @BindView(R.id.textRepoIssues) TextView repoIssues;
+
+    private Unbinder unbinder;
+
 
 
     //  Метод для установки нового значения repoID, вызывается из DetailActivity.
@@ -43,7 +62,7 @@ public class RepoDetailFragment extends Fragment {
     //  метод setRepoId() вызывается владельцем Фрагмента только после создания фрагмента,
     //  то всю инициализацию надо выполнить в обработчике onStart()!
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedState) {
 
         //  Восстановление данных при повороте экрана.
         if (savedState != null) {
@@ -51,7 +70,12 @@ public class RepoDetailFragment extends Fragment {
         }
 
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_repo_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_repo_detail, container, false);
+
+        //  ButterKnife.
+        unbinder = ButterKnife.bind(this, rootView);
+
+        return rootView;
     }
 
 
@@ -62,26 +86,26 @@ public class RepoDetailFragment extends Fragment {
         super.onStart();
 
         //  Получение корневого объекта View фрагмента. Теперь можно использовать метод findViewById().
-        View rootView = getView();
+        //  ButterKnife - View rootView = getView();
 
         //  Repo Language
-        TextView repoLang = rootView.findViewById(R.id.textRepoLang);
+        //TextView repoLang = rootView.findViewById(R.id.textRepoLang);
         repoLang.setText(GitHubRepo.repos[repoID].getMainLang());
 
         //  Repo Stars Count
-        TextView repoStars = rootView.findViewById(R.id.textRepoStars);
+        //TextView repoStars = rootView.findViewById(R.id.textRepoStars);
         repoStars.setText(String.valueOf(GitHubRepo.repos[repoID].getStarsCount()));
 
         //  Repo Watchers Count
-        TextView repoWatchs = rootView.findViewById(R.id.textRepoWatchers);
+        //TextView repoWatchs = rootView.findViewById(R.id.textRepoWatchers);
         repoWatchs.setText(String.valueOf(GitHubRepo.repos[repoID].getWatchersCount()));
 
         //  Repo Forks Count
-        TextView repoForks = rootView.findViewById(R.id.textRepoForks);
+        //TextView repoForks = rootView.findViewById(R.id.textRepoForks);
         repoForks.setText(String.valueOf(GitHubRepo.repos[repoID].getForksCount()));
 
         //  Repo Issues Count
-        TextView repoIssues = rootView.findViewById(R.id.textRepoIssues);
+        //TextView repoIssues = rootView.findViewById(R.id.textRepoIssues);
         repoIssues.setText(String.valueOf(GitHubRepo.repos[repoID].getIssuesCount()));
 
 
@@ -92,15 +116,25 @@ public class RepoDetailFragment extends Fragment {
                 (RepoMainInfoFragment) childFragmentManager.findFragmentById(R.id.fragmentRepoMainInfo);
 
         //  Передаем repoID вложенному фрагменту, он заполнит свои представления правильным контентом.
-        fragmentRepoMainInfo.setRepoId(repoID);
+        if (fragmentRepoMainInfo != null) {
+            fragmentRepoMainInfo.setRepoId(repoID);
+        }
 
     }
 
 
     //  Сохранение состояния Фрагмента перед уничтожением.
     @Override
-    public void onSaveInstanceState(Bundle saveState) {
+    public void onSaveInstanceState(@NonNull Bundle saveState) {
         saveState.putInt(ARG_REPO_ID, repoID);
         super.onSaveInstanceState(saveState);
+    }
+
+
+    //  ButterKnife. Set the views to null.
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }
