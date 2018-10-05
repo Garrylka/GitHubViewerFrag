@@ -1,159 +1,41 @@
 package ru.roskvartal.garry.githubviewerfrag.model;
 
-import android.annotation.SuppressLint;
-import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 
 import java.io.IOException;
-import java.util.Random;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
 
-//  Переход на Mosby MVP LCE.
+//  Переход на RxJava 2 и List<GitHubRepo>.
 public class RepoModelImpl implements RepoModel {
 
-    //  TEST: Эмуляция ошибки при загрузке данных.
-    private Random random = new Random();
-    private Throwable error = null;
+    private static final int BUF_SIZE = 10;
+    private static final long DELAY_SEC = 2;
+    private static final float PCT_ERROR = 0.5f;
 
 
+    //  1) Загрузка данных.
+    //  Result fromArray() - Flowable<GitHubRepo>
+    //  Result buffer()    - Flowable<List<GitHubRepo>>
     @Override
-    public GitHubRepo[] getRepos() {
-        return GitHubRepo.repos;
-    }
-
-
-    @Override
-    public GitHubRepo getRepoByPos(int position) {
-        return GitHubRepo.repos[position];
-    }
-
-
-    @Nullable
-    @Override
-    public GitHubRepo getRepoById(int repoId) {
-        for (GitHubRepo r: GitHubRepo.repos) {
-            if (r.getRepoId() == repoId) {
-                return r;
-            }
-        }
-        return null;
-    }
-
-
-    @Override
-    public int getReposCount() {
-        return GitHubRepo.repos.length;
-    }
-
-
-    //  TEST Тестирование:
-    //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
-    @SuppressLint("StaticFieldLeak")
-    @Override
-    public void getReposDefer(final MyTestAction<GitHubRepo[]> onNext) {
-
-        new AsyncTask<Void, Void, GitHubRepo[]>() {
-
-            @Override
-            protected GitHubRepo[] doInBackground(Void ... params) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return getRepos();
-            }
-
-            @Override
-            protected void onPostExecute (GitHubRepo[] data) {
-                onNext.call(data);
-            }
-
-        }.execute ();
+    public Flowable<List<GitHubRepo>> getRepos() {
+        return Flowable.fromArray(GitHubRepo.repos).buffer(BUF_SIZE);
     }
 
     //  2) Эмуляция задержки и ошибки при загрузке данных.
-    @SuppressLint("StaticFieldLeak")
     @Override
-    public void getReposDeferError(final MyTestAction<GitHubRepo[]> onNext) {
-
-        new AsyncTask<Void, Void, GitHubRepo[]>() {
-
-            @Override
-            protected GitHubRepo[] doInBackground(Void ... params) {
-                try {
-                    Thread.sleep(2000);
-
-                    //  TEST: Эмуляция ошибки при загрузке данных.
-                    if (random.nextBoolean()) {
-                        throw new IOException();
+    public Flowable<List<GitHubRepo>> getReposError() {
+        return Flowable
+                .timer(DELAY_SEC, TimeUnit.SECONDS)
+                .flatMap((Function<Long, Flowable<List<GitHubRepo>>>) aLong -> {
+                    if (Math.random() > PCT_ERROR) {
+                        return Flowable.error(new IOException());
                     }
-                } catch (InterruptedException | IOException e) {
-                    //e.printStackTrace();
-                    //  TEST: Эмуляция ошибки при загрузке данных.
-                    error = e;
-                    return null;
-                }
-                return getRepos();
-            }
-
-            @Override
-            protected void onPostExecute (GitHubRepo[] data) {
-                onNext.call(data);
-            }
-
-        }.execute();
+                    return Flowable.fromArray(GitHubRepo.repos).buffer(BUF_SIZE);
+                });
     }
-
-
-    @Override
-    public Throwable getError() {
-        return error;
-    }
-
-
-    //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
-    //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
-    @SuppressLint("StaticFieldLeak")
-    @Override
-    public void getReposDeferError2(
-            final MyTestAction<GitHubRepo[]> onNext, final MyTestAction<Exception> onError) {
-
-        new AsyncTask<Void, Void, GitHubRepo[]>() {
-
-            private Exception exception ;
-
-            @Override
-            protected GitHubRepo[] doInBackground(Void ... params) {
-                try {
-                    Thread.sleep(2000);
-
-                    //  TEST: Эмуляция ошибки при загрузке данных.
-                    if (Math.random() > 0.5) {
-                        throw new IOException();
-                    }
-                } catch (Exception e) {
-                    //e.printStackTrace();
-                    //  TEST: Эмуляция ошибки при загрузке данных.
-                    exception = e;
-                    return null;
-                }
-                return getRepos();
-            }
-
-            @Override
-            protected void onPostExecute (GitHubRepo[] data) {
-                if (exception != null) {
-                    onError.call(exception);
-                } else {
-                    onNext.call(data);
-                }
-            }
-
-        }.execute ();
-    }
-
 }
-

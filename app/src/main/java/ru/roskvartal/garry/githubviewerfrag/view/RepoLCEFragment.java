@@ -15,6 +15,8 @@ import com.hannesdorfmann.mosby3.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.MvpLceViewStateFragment;
 import com.hannesdorfmann.mosby3.mvp.viewstate.lce.data.RetainingLceViewState;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -26,6 +28,7 @@ import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 
 /**
+ *  Переход на RxJava 2 и List<GitHubRepo>.
  *  Переход на Mosby MVP LCE ViewState.
  *  Переход на ButterKnife.
  *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI,
@@ -33,7 +36,7 @@ import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
  */
 public class RepoLCEFragment
-        extends MvpLceViewStateFragment<RecyclerView, GitHubRepo[], ReposView, ReposPresenter>
+        extends MvpLceViewStateFragment<RecyclerView, List<GitHubRepo>, ReposView, ReposPresenter>
         implements ReposView {
 
     //private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
@@ -108,7 +111,7 @@ public class RepoLCEFragment
 
         super.onViewCreated(rootView, savedInstance);
 
-        //  ButterKnife
+        //  ButterKnife.
         unbinder = ButterKnife.bind(this, rootView);
 
 
@@ -155,16 +158,16 @@ public class RepoLCEFragment
 
     @Override
     public void onDetach() {
-        super.onDetach();
         listener = null;
+        super.onDetach();
     }
 
 
     //  ButterKnife. Set the views to null.
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         unbinder.unbind();
+        super.onDestroyView();
     }
 
 
@@ -176,27 +179,18 @@ public class RepoLCEFragment
     //      void showContent()
 
     //  Развязка Model и View через Presenter!
-    //  В этом простом случае из модели в представление просто передается ссылка на тестовый массив repos.
+    //  Загрузка данных.
     @Override
     public void loadData(boolean pullToRefresh) {
-        //presenter.loadRepos(pullToRefresh);
 
-        //  TEST Тестирование:
-        //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
-        //presenter.loadReposDefer(pullToRefresh);
-
-        //  2) Эмуляция задержки и ошибки при загрузке данных.
-        //presenter.loadReposDeferError(pullToRefresh);
-
-        //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
-        //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
-        presenter.loadReposDeferError2(pullToRefresh);
+        presenter.loadRepos(pullToRefresh);
     }
 
 
     @Override
-    public void setData(GitHubRepo[] repos) {
-        listAdapter.setRepos(repos);
+    public void setData(List<GitHubRepo> repos) {
+        //  FIXME Rx Добавление данных порциями buffer(BUF_SIZE)!
+        listAdapter.addRepos(repos);
         listAdapter.notifyDataSetChanged();
     }
 
@@ -210,15 +204,15 @@ public class RepoLCEFragment
 
     @Override
     public void showContent() {
-        super.showContent();
         swipeRefresh.setRefreshing(false);
+        super.showContent();
     }
 
 
     @Override
     public void showError(Throwable e, boolean pullToRefresh) {
-        super.showError(e, pullToRefresh);
         swipeRefresh.setRefreshing(false);
+        super.showError(e, pullToRefresh);
     }
 
 
@@ -232,14 +226,32 @@ public class RepoLCEFragment
     //  Переход на Mosby MVP LCE ViewState.
     @NonNull
     @Override
-    public LceViewState<GitHubRepo[], ReposView> createViewState() {
+    public LceViewState<List<GitHubRepo>, ReposView> createViewState() {
         return new RetainingLceViewState<>();
     }
 
 
+    @Nullable
     @Override
-    public GitHubRepo[] getData() {
+    public List<GitHubRepo> getData() {
         return (listAdapter == null ? null : listAdapter.getRepos());
     }
 
+
+    //  Очистка данных в адаптере при SwipeRefresh.
+    @Override
+    public void clearViewData() {
+        if (getData() != null) {
+            getData().clear();
+            listAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    //  TEST
+    //  Возвращает размер нашего набора данных.
+    @Override
+    public int getDataCount() {
+        return (listAdapter == null ? 0 : listAdapter.getItemCount());
+    }
 }

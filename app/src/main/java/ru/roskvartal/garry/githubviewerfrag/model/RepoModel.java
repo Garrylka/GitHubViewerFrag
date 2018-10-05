@@ -1,32 +1,17 @@
 package ru.roskvartal.garry.githubviewerfrag.model;
 
+import java.util.List;
+
+import io.reactivex.Flowable;
 import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
 
-//  Переход на Mosby MVP LCE.
+//  Переход на RxJava 2 и List<GitHubRepo>.
 public interface RepoModel {
 
-    GitHubRepo[] getRepos();
+    //  1) Загрузка данных.
+    Flowable<List<GitHubRepo>> getRepos();
 
-    GitHubRepo getRepoByPos(int position);
-
-    GitHubRepo getRepoById(int repoId);
-
-    int getReposCount();
-
-    //  TEST Тестирование:
-    //  1) ProgressBar при помощи эмуляции задержки загрузки данных.
-    void getReposDefer(final MyTestAction<GitHubRepo[]> onNext);
-
-    //  2) Эмуляция ошибки при загрузке данных.
-    void getReposDeferError(final MyTestAction<GitHubRepo[]> onNext);
-
-    Throwable getError();
-
-    //  3) Другой вариант эмуляции задержки и ошибки при загрузке данных.
-    //  Используется два отдельных Action: для получения данных, при возникновении ошибки.
-    void getReposDeferError2(
-            final MyTestAction<GitHubRepo[]> onNext, final MyTestAction<Exception> onError);
-
-
+    //  2) Эмуляция задержки и ошибки при загрузке данных.
+    Flowable<List<GitHubRepo>> getReposError();
 }

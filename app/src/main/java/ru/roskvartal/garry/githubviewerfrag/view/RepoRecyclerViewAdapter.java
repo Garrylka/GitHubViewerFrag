@@ -1,5 +1,6 @@
 package ru.roskvartal.garry.githubviewerfrag.view;
 
+
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.roskvartal.garry.githubviewerfrag.R;
@@ -15,17 +19,23 @@ import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 
 
 /**
+ *  Переход на RxJava 2 и List<GitHubRepo>.
  *  Собственный класс Адаптера для RecyclerView.
  *  Переход на ButterKnife.
  */
 public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerViewAdapter.RepoViewHolder> {
 
     //  Ссылка на данные.
-    private GitHubRepo[] repos;
+    private List<GitHubRepo> repos;
 
     //  Слушатель клика на элементе списка.
     private OnItemClickListener listener;
 
+
+
+    public RepoRecyclerViewAdapter() {
+        repos = new ArrayList<>();
+    }
 
 
     //  Интерфейс с методом обратного вызова для обработки клика на элементе списка.
@@ -41,14 +51,26 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     }
 
 
-    //  Установка ссылки на данные.
-    public void setRepos(GitHubRepo[] repos) {
-        this.repos = repos;
+    //  OLD: Установка ссылки на данные.
+    //public void setRepos(GitHubRepo[] data) {
+    //    repos = data;
+    //}
+
+
+    //  Rx: Добавление в список 1 элемента данных.
+    public void addRepo(GitHubRepo data) {
+        repos.add(data);
+    }
+
+
+    //  Rx: Добавление в список новой порции данных.
+    public void addRepos(List<GitHubRepo> data) {
+        repos.addAll(data);
     }
 
 
     //  Для перехода на Mosby MVP LCE ViewState.
-    public GitHubRepo[] getRepos() {
+    public List<GitHubRepo> getRepos() {
         return repos;
     }
 
@@ -118,23 +140,25 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     @Override
     public void onBindViewHolder(@NonNull RepoRecyclerViewAdapter.RepoViewHolder viewHolder, int position) {
 
+        GitHubRepo repo = repos.get(position);
+
         //  User Avatar
-        viewHolder.userAvatar.setImageResource(repos[position].getOwnerAvatarId());
+        viewHolder.userAvatar.setImageResource(repo.getOwnerAvatarId());
         //  User Name
-        viewHolder.userName.setText(repos[position].getOwnerName());
+        viewHolder.userName.setText(repo.getOwnerName());
         //  Repo Name
-        viewHolder.repoName.setText(repos[position].getRepoName());
+        viewHolder.repoName.setText(repo.getRepoName());
         //  Repo Desc
-        viewHolder.repoDesc.setText(repos[position].getRepoDesc());
+        viewHolder.repoDesc.setText(repo.getRepoDesc());
         //  Repo Url
-        viewHolder.repoUrl.setText(repos[position].getRepoUrl());
+        viewHolder.repoUrl.setText(repo.getRepoUrl());
     }
 
 
     //  Возвращает размер нашего набора данных (вызывается layout manager-ом).
     @Override
     public int getItemCount() {
-        return (repos == null ? 0 : repos.length);
+        return (repos == null ? 0 : repos.size());
     }
 
 }
