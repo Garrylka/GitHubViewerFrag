@@ -14,8 +14,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
+import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 
 
 /**
@@ -26,7 +27,7 @@ import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerViewAdapter.RepoViewHolder> {
 
     //  Ссылка на данные.
-    private List<GitHubRepo> repos;
+    private List<GitHubRepoMaster> repos;
 
     //  Слушатель клика на элементе списка.
     private OnItemClickListener listener;
@@ -58,19 +59,19 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
 
 
     //  Rx: Добавление в список 1 элемента данных.
-    public void addRepo(GitHubRepo data) {
+    public void addRepo(GitHubRepoMaster data) {
         repos.add(data);
     }
 
 
     //  Rx: Добавление в список новой порции данных.
-    public void addRepos(List<GitHubRepo> data) {
+    public void addRepos(List<GitHubRepoMaster> data) {
         repos.addAll(data);
     }
 
 
     //  Для перехода на Mosby MVP LCE ViewState.
-    public List<GitHubRepo> getRepos() {
+    public List<GitHubRepoMaster> getRepos() {
         return repos;
     }
 
@@ -140,10 +141,10 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     @Override
     public void onBindViewHolder(@NonNull RepoRecyclerViewAdapter.RepoViewHolder viewHolder, int position) {
 
-        GitHubRepo repo = repos.get(position);
+        GitHubRepoMaster repo = repos.get(position);
 
         //  User Avatar
-        viewHolder.userAvatar.setImageResource(repo.getOwnerAvatarId());
+        //viewHolder.userAvatar.setImageResource(repo.getOwnerAvatarId());
         //  User Name
         viewHolder.userName.setText(repo.getOwnerName());
         //  Repo Name

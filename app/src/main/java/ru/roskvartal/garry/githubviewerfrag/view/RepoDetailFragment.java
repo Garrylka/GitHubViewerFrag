@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
+import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepo;
 
 
 /**

@@ -1,4 +1,4 @@
-package ru.roskvartal.garry.githubviewerfrag.entity;
+package ru.roskvartal.garry.githubviewerfrag.model.entity;
 
 import ru.roskvartal.garry.githubviewerfrag.R;
 import android.support.annotation.Nullable;

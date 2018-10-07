@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
+import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepo;
 
 
 /**

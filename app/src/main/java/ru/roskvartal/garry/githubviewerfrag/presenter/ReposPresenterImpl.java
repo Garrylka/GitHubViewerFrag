@@ -13,6 +13,7 @@ import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
 import ru.roskvartal.garry.githubviewerfrag.view.ReposView;
 
 
+//  Переход на Retrofit/Gson.
 //  Переход на RxJava 2 и List<GitHubRepo>.
 public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements ReposPresenter {
 
@@ -53,8 +54,8 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
             view.showLoading(pullToRefresh);
         });
 
-        disposable = model.getReposError()
-                .subscribeOn(Schedulers.io())
+        disposable = model.getRepos()
+                //.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         data -> {
@@ -69,11 +70,11 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
                             Log.d(LOGCAT_TAG, "doOnError(): " + e.toString());
 
                             ifViewAttached(view -> view.showError(e, pullToRefresh));
-                        },
-                        () -> ifViewAttached(
-                            view -> Log.d(LOGCAT_TAG, "doOnComplete(): " + view.getDataCount())
-                        )
-
+                        }
+                        //,
+                        //() -> ifViewAttached(
+                        //    view -> Log.d(LOGCAT_TAG, "doOnComplete(): " + view.getDataCount())
+                        //)
                 );
     }
 }

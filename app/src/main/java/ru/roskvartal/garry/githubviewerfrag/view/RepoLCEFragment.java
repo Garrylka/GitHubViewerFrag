@@ -20,9 +20,15 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.entity.GitHubRepo;
 import ru.roskvartal.garry.githubviewerfrag.model.RepoModelImpl;
+import ru.roskvartal.garry.githubviewerfrag.model.api.GitHubService;
+import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenter;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
@@ -36,7 +42,7 @@ import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
  */
 public class RepoLCEFragment
-        extends MvpLceViewStateFragment<RecyclerView, List<GitHubRepo>, ReposView, ReposPresenter>
+        extends MvpLceViewStateFragment<RecyclerView, List<GitHubRepoMaster>, ReposView, ReposPresenter>
         implements ReposView {
 
     //private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
@@ -71,7 +77,14 @@ public class RepoLCEFragment
     @NonNull
     @Override
     public ReposPresenter createPresenter() {
-        return new ReposPresenterImpl(new RepoModelImpl());
+        return new ReposPresenterImpl(
+                new RepoModelImpl(
+                        new Retrofit.Builder().baseUrl(GitHubService.API_ENDPOINT)
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                        .create(GitHubService.class)
+                ));
     }
 
 
@@ -188,7 +201,7 @@ public class RepoLCEFragment
 
 
     @Override
-    public void setData(List<GitHubRepo> repos) {
+    public void setData(List<GitHubRepoMaster> repos) {
         //  FIXME Rx Добавление данных порциями buffer(BUF_SIZE)!
         listAdapter.addRepos(repos);
         listAdapter.notifyDataSetChanged();
@@ -226,14 +239,14 @@ public class RepoLCEFragment
     //  Переход на Mosby MVP LCE ViewState.
     @NonNull
     @Override
-    public LceViewState<List<GitHubRepo>, ReposView> createViewState() {
+    public LceViewState<List<GitHubRepoMaster>, ReposView> createViewState() {
         return new RetainingLceViewState<>();
     }
 
 
     @Nullable
     @Override
-    public List<GitHubRepo> getData() {
+    public List<GitHubRepoMaster> getData() {
         return (listAdapter == null ? null : listAdapter.getRepos());
     }
 
