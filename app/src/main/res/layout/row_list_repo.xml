@@ -21,7 +21,7 @@
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:paddingLeft="@dimen/margin_horizontal"
             android:paddingStart="@dimen/margin_horizontal">
 
@@ -29,6 +29,7 @@
                 android:id="@+id/textUserName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:gravity="center_vertical"
                 android:drawableLeft="@drawable/octicon_person_vec"
@@ -39,7 +40,7 @@
                 android:id="@+id/textRepoName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_vertical"
+                android:layout_weight="1"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:gravity="center_vertical"
                 android:drawableLeft="@drawable/octicon_repo_vec"

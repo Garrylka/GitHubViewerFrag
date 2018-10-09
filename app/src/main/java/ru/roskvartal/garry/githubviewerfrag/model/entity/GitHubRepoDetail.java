@@ -6,8 +6,10 @@ import android.support.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 
-//  Переход на Retrofit/Gson.
-//  Детальные реквизиты репозитория (@GET("repos/{owner}/{repo}")).
+/**
+ *  Переход на Retrofit/Gson.
+ *  Детальные реквизиты репозитория (@GET("repos/{owner}/{repo}")).
+ */
 public class GitHubRepoDetail {
 
     @SerializedName("language")

@@ -33,6 +33,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
+                                      <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="foregroundImage" value="C:\Users\Garry\Projects\Android\Roskvartal\Pics\Octocat.png" />
                                     </map>
                                   </option>

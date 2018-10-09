@@ -1,5 +1,6 @@
 package ru.roskvartal.garry.githubviewerfrag.view;
 
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,15 +29,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.roskvartal.garry.githubviewerfrag.R;
 import ru.roskvartal.garry.githubviewerfrag.model.RepoModelImpl;
 import ru.roskvartal.garry.githubviewerfrag.model.api.GitHubService;
+import ru.roskvartal.garry.githubviewerfrag.model.api.ImageLoaderImpl;
 import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenter;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 
 /**
- *  Переход на RxJava 2 и List<GitHubRepo>.
- *  Переход на Mosby MVP LCE ViewState.
+ *  Подключение в проетк библиотеки Picasso для загрузки изображений из Интернет.
+ *  Переход на Retrofit/Gson.
  *  Переход на ButterKnife.
+ *  Переход на RxJava 2 и List<T>.
+ *  Переход на Mosby MVP LCE ViewState.
  *  Фрагмент RepoLCEFragment (пришел на замену RepoListFragment), в котором спрятан Master GUI,
  *  взаимодействует с MainActivity.
  *  Вместо ListView содержит SwipeRefreshLayout, RecyclerView.
@@ -147,7 +151,8 @@ public class RepoLCEFragment
         contentView.setHasFixedSize(true);
 
         //  Назначение адаптера для вывода строк.
-        listAdapter = new RepoRecyclerViewAdapter();
+        //  + Использование Picasso для загрузки Аватарок.
+        listAdapter = new RepoRecyclerViewAdapter(new ImageLoaderImpl());
 
         //  Обработчик нажатия на элементе списка.
         //  Вызывает callback метод onRepoListItemClicked() в активности.
@@ -202,9 +207,8 @@ public class RepoLCEFragment
 
     @Override
     public void setData(List<GitHubRepoMaster> repos) {
-        //  FIXME Rx Добавление данных порциями buffer(BUF_SIZE)!
-        listAdapter.addRepos(repos);
-        listAdapter.notifyDataSetChanged();
+        //  FIXME Rx Retrofit Добавление данных одной пачкой (100 заисей)!
+        listAdapter.setData(repos);
     }
 
 
@@ -247,16 +251,15 @@ public class RepoLCEFragment
     @Nullable
     @Override
     public List<GitHubRepoMaster> getData() {
-        return (listAdapter == null ? null : listAdapter.getRepos());
+        return listAdapter.getData();
     }
 
 
     //  Очистка данных в адаптере при SwipeRefresh.
     @Override
-    public void clearViewData() {
-        if (getData() != null) {
-            getData().clear();
-            listAdapter.notifyDataSetChanged();
+    public void clearData(boolean pullToRefresh) {
+        if (pullToRefresh) {
+            listAdapter.clearData();
         }
     }
 
@@ -265,6 +268,6 @@ public class RepoLCEFragment
     //  Возвращает размер нашего набора данных.
     @Override
     public int getDataCount() {
-        return (listAdapter == null ? 0 : listAdapter.getItemCount());
+        return listAdapter.getItemCount();
     }
 }

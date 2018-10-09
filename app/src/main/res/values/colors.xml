@@ -7,4 +7,5 @@
     <color name="color_app_logo_text">#303F9F</color>
     <color name="color_text_border_line">#D0E0FF</color>
     <color name="color_text_border_back">#FFF</color>
+    <color name="ic_launcher_background">#26A69A</color>
 </resources>

@@ -6,8 +6,10 @@ import android.support.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 
-//  Переход на Retrofit/Gson.
-//  Основные реквизиты репозитория (@GET("repositories")).
+/**
+ *  Переход на Retrofit/Gson.
+ *  Основные реквизиты репозитория (@GET("repositories")).
+ */
 public class GitHubRepoMaster {
 
     @SerializedName("id")
@@ -28,6 +30,7 @@ public class GitHubRepoMaster {
     private GitHubRepoOwner owner;      //  Подкласс (owner).
 
 
+    //  Getters.
     public int getRepoId() {
         return repoId;
     }

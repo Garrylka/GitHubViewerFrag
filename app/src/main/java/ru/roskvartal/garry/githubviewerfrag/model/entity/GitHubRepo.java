@@ -1,9 +1,14 @@
 package ru.roskvartal.garry.githubviewerfrag.model.entity;
 
+
 import ru.roskvartal.garry.githubviewerfrag.R;
 import android.support.annotation.Nullable;
 
 
+/**
+ *  TEST
+ *  Тестовые локальные данные пока не используется загрузка из Интернет.
+ */
 public class GitHubRepo {
 
     //  Основные реквизиты репозитория.

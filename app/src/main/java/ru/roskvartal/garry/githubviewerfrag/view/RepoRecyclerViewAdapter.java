@@ -16,13 +16,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import ru.roskvartal.garry.githubviewerfrag.R;
+import ru.roskvartal.garry.githubviewerfrag.model.api.ImageLoader;
 import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 
 
 /**
- *  Переход на RxJava 2 и List<GitHubRepo>.
- *  Собственный класс Адаптера для RecyclerView.
+ *  Подключение в проетк библиотеки Picasso для загрузки изображений из Интернет.
+ *  Переход на Retrofit/Gson.
  *  Переход на ButterKnife.
+ *  Переход на RxJava 2 и List<T>.
+ *  Класс Адаптера для RecyclerView.
  */
 public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerViewAdapter.RepoViewHolder> {
 
@@ -32,10 +35,15 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     //  Слушатель клика на элементе списка.
     private OnItemClickListener listener;
 
+    //  ImageLoader для загрузки Аватарок.
+    private ImageLoader<ImageView> imageLoader;
 
 
-    public RepoRecyclerViewAdapter() {
+
+    //  Constructor.
+    public RepoRecyclerViewAdapter(ImageLoader<ImageView> imageLoader) {
         repos = new ArrayList<>();
+        this.imageLoader = imageLoader;
     }
 
 
@@ -52,27 +60,23 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     }
 
 
-    //  OLD: Установка ссылки на данные.
-    //public void setRepos(GitHubRepo[] data) {
-    //    repos = data;
-    //}
-
-
-    //  Rx: Добавление в список 1 элемента данных.
-    public void addRepo(GitHubRepoMaster data) {
-        repos.add(data);
-    }
-
-
     //  Rx: Добавление в список новой порции данных.
-    public void addRepos(List<GitHubRepoMaster> data) {
+    public void setData(List<GitHubRepoMaster> data) {
         repos.addAll(data);
+        notifyDataSetChanged();
     }
 
 
     //  Для перехода на Mosby MVP LCE ViewState.
-    public List<GitHubRepoMaster> getRepos() {
+    public List<GitHubRepoMaster> getData() {
         return repos;
+    }
+
+
+    //  Очистка данных при SwipeRefresh.
+    public void clearData() {
+        repos.clear();
+        notifyDataSetChanged();
     }
 
 
@@ -143,8 +147,8 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
 
         GitHubRepoMaster repo = repos.get(position);
 
-        //  User Avatar
-        //viewHolder.userAvatar.setImageResource(repo.getOwnerAvatarId());
+        //  User Avatar (+ Загрузка через Picasso).
+        imageLoader.loadImage(repo.getOwnerAvatarUrl(), viewHolder.userAvatar);
         //  User Name
         viewHolder.userName.setText(repo.getOwnerName());
         //  Repo Name
@@ -156,7 +160,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     }
 
 
-    //  Возвращает размер нашего набора данных (вызывается layout manager-ом).
+    //  Возвращает размер набора данных (вызывается layout manager-ом).
     @Override
     public int getItemCount() {
         return (repos == null ? 0 : repos.size());
