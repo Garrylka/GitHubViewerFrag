@@ -25,7 +25,7 @@ public class MyApplication extends Application {
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .name("github_repos_realm.realm")
                 .build();
-        //Realm.deleteRealm(config);                  //  Удаление БД при перезапусках приложения.
+        Realm.deleteRealm(config);                  //  Удаление БД при перезапусках приложения.
         Realm.setDefaultConfiguration(config);      //  Установка новой конфигурации по умолчанию.
     }
 }

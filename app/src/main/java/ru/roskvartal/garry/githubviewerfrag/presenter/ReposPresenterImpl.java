@@ -77,7 +77,7 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
                     .subscribe(
                             data -> {
                                 //Log.d(LOGCAT_TAG, "lifecycle().onItem() on Thread: " + Thread.currentThread().getName());
-                                Log.d(LOGCAT_TAG, "lifecycle().onItem(): " + data.size());
+                                Log.d(LOGCAT_TAG, "lifecycle().onNext(): " + data.size());
 
                                 //  Отображение данных.
                                 ifViewAttached(v -> {
@@ -112,17 +112,23 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
 
         loading = model.loadFromRealm()
                 .map(List::isEmpty)
-                .doOnNext(isEmpty -> ifViewAttached(v -> v.showLoading(pullToRefresh)))
-                .zipWith(model.loadFromInet().map(List::isEmpty).onErrorReturn(t -> true), Pair::create)
+                .doOnNext(isEmpty ->
+                        ifViewAttached(v -> v.showLoading(pullToRefresh)))
+                .zipWith(model.loadFromInet()
+                        .map(List::isEmpty)
+                        .onErrorReturn(t -> true), Pair::create)
                 .subscribe(
                         pair -> {
                             boolean isViewEmpty   = pair.first;
                             boolean isErrorCaused = pair.second;
 
-                            if (isErrorCaused) {
+                            if (isViewEmpty && isErrorCaused) {
                                 ifViewAttached(v -> v.showError(new Throwable(ERR_INTERNET), pullToRefresh));
                             } else {
                                 ifViewAttached(MvpLceView::showContent);
+                                if (isErrorCaused) {
+                                    ifViewAttached(v -> v.showError(new Throwable(ERR_INTERNET), true));
+                                }
                             }
                         });
     }

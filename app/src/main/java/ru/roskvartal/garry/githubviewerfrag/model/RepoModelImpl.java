@@ -68,9 +68,10 @@ public class RepoModelImpl implements RepoModel {
 
         Log.d(LOGCAT_TAG, "Model.closeRealmSession() !!!");
 
-        //  Проверка на null в вызывающем коде!
-        realm.close();
-        realm = null;
+        if (realm != null) {
+            realm.close();
+            realm = null;
+        }
     }
 
 
@@ -138,6 +139,8 @@ public class RepoModelImpl implements RepoModel {
 
             //  Формируем запрос к БД.
             return realm.where(GitHubRepoMaster.class)
+                    //.limit(10)                              //  А можно на этом этапе отсеять!
+                    .sort("owner.ownerName")
                     .findAllAsync()                         //  Возвращает тип <? extends List<>>
                     .asFlowable()                           //  В Realm есть только этот каст! :(
                     .filter(RealmResults::isLoaded)         //  TODO Узнать, что значит эта проверка!
@@ -156,8 +159,28 @@ public class RepoModelImpl implements RepoModel {
                 .observeOn(scheduler)               //  UI поток!
                 .flatMapIterable(list -> list)      //  ACHTUNG! Метода flatMapIterable() нет в Single<>!
                 .take(10)                           //  TEST!
-                .doOnNext(repoInet -> {
+                .toList()
+                .doOnSuccess(repos -> {
+                    Log.d(LOGCAT_TAG, "loadFromInet.doOnNext(): " + repos.size());
 
+                    //  Проверяем состояние соединения с БД.
+                    if (!isRealmOpened()) {
+                        throw new IllegalStateException(ERR_REALM_CLOSED);
+                    }
+
+                    //  Выполняем транзакцию БД в асинхронном режиме.
+                    realm.executeTransactionAsync( r -> {
+
+                        //  Вставка списка объектов в БД.
+                        //  Теперь данные всегда обновляются => приходят во VIEW!
+                        r.insertOrUpdate(repos);
+
+                    });
+                })
+                .toObservable();
+
+/*
+                .doOnNext(repoInet -> {
                     Log.d(LOGCAT_TAG, "loadFromInet.doOnNext(): " + repoInet.getRepoName());
 
                     //  Проверяем состояние соединения с БД.
@@ -201,6 +224,7 @@ public class RepoModelImpl implements RepoModel {
                 })
                 .toList()           //  Возвращает тип Single<List<>>
                 .toObservable();
+*/
     }
 
 
