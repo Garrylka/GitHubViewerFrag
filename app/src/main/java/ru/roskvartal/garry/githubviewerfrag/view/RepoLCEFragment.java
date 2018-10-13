@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import io.reactivex.schedulers.Schedulers;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -49,7 +52,8 @@ public class RepoLCEFragment
         extends MvpLceViewStateFragment<RecyclerView, List<GitHubRepoMaster>, ReposView, ReposPresenter>
         implements ReposView {
 
-    //private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
+    private static final String LOGCAT_TAG    = "LIST";                         //  DEBUG
+
     private static final String ERR_MUST_IMPL = " должен реализовать RepoLCEFragment.OnRepoListFragmentListener";
     private static final String ERR_UNKNOWN_ERR = "Неизвестная ошибка!";
 
@@ -84,7 +88,8 @@ public class RepoLCEFragment
         return new ReposPresenterImpl(
                 new RepoModelImpl(
                         new Retrofit.Builder().baseUrl(GitHubService.API_ENDPOINT)
-                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory
+                                .createWithScheduler(Schedulers.io()))          //  Заменил при добавлении Realm.
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
                         .create(GitHubService.class)
@@ -207,7 +212,7 @@ public class RepoLCEFragment
 
     @Override
     public void setData(List<GitHubRepoMaster> repos) {
-        //  FIXME Rx Retrofit Добавление данных одной пачкой (100 заисей)!
+        //  FIXME Rx Retrofit Добавление данных одной пачкой в 100 заисей!
         listAdapter.setData(repos);
     }
 
@@ -221,6 +226,9 @@ public class RepoLCEFragment
 
     @Override
     public void showContent() {
+
+        Log.d(LOGCAT_TAG, "LCEFragment.showContent()");
+
         swipeRefresh.setRefreshing(false);
         super.showContent();
     }
@@ -265,7 +273,7 @@ public class RepoLCEFragment
 
 
     //  TEST
-    //  Возвращает размер нашего набора данных.
+    //  Возвращает количество элементов в списке.
     @Override
     public int getDataCount() {
         return listAdapter.getItemCount();

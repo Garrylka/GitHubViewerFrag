@@ -5,14 +5,21 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
 
 /**
+ *  Добавление БД Realm.
  *  Переход на Retrofit/Gson.
- *  Основные реквизиты Owner.
- *  Поле owner в классе GitHubRepoMaster.
- *  Требуется для правильной десериализации Json данных с сервера GitHub.
+ *  Мастер данные - основные реквизиты Owner (мембер owner в классе GitHubRepoMaster).
+ *  Требуется для правильной автоматической десериализации Json данных о public репозиториях с сервера GitHub.
  */
-public class GitHubRepoOwner {
+public class GitHubRepoOwner extends RealmObject {
+
+    @PrimaryKey                         //  Требуется для правильной вставки в БД Realm без дубликатов.
+    @SerializedName("id")
+    private int    ownerId;             //  ID владельца (id).
 
     @SerializedName("login")
     private String ownerName;           //  Имя владельца (owner.login).
@@ -22,6 +29,10 @@ public class GitHubRepoOwner {
 
 
     //  Getters.
+    public int getOwnerId() {
+        return ownerId;
+    }
+
     @Nullable
     public String getOwnerName() {
         return ownerName;

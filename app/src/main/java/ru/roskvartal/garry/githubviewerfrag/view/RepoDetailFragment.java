@@ -19,6 +19,7 @@ import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepo;
 
 
 /**
+ *  Переход на Retrofit / Picasso / Realm.
  *  Фрагмент RepoDetailFragment, в котором спрятан Detail GUI, взаимодействует с DetailActivity.
  *  + Взаимодействует с вложенным фрагментом RepoMainInfoFragment, который повторно использует макет
  *   от элемента списка row_list_repo с основной информацией о репозитории.
@@ -87,6 +88,9 @@ public class RepoDetailFragment extends Fragment {
 
         //  Получение корневого объекта View фрагмента. Теперь можно использовать метод findViewById().
         //  ButterKnife - View rootView = getView();
+
+        //  Переход на Retrofit / Picasso / Realm.
+
 
         //  Repo Language
         //TextView repoLang = rootView.findViewById(R.id.textRepoLang);

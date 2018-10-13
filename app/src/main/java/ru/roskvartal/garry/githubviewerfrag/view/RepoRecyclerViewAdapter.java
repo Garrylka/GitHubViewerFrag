@@ -119,7 +119,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
             if (listener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    listener.onItemClick(view, position);
+                    listener.onItemClick(view, repos.get(position).getRepoId());
                 }
             }
         }
@@ -160,7 +160,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     }
 
 
-    //  Возвращает размер набора данных (вызывается layout manager-ом).
+    //  Возвращает количество элементов в списке (вызывается layout manager-ом).
     @Override
     public int getItemCount() {
         return (repos == null ? 0 : repos.size());

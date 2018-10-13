@@ -12,6 +12,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class GitHubRepoDetail {
 
+    @SerializedName("id")
+    private int    repoId;              //  ID репозитория (id).
+
     @SerializedName("language")
     private String mainLang;            //  Основной язык кода (language).
 
@@ -27,6 +30,11 @@ public class GitHubRepoDetail {
     @SerializedName("open_issues_count")
     private int    issuesCount;         //  Количество открытых заявок (open_issues_count).
 
+
+    //  Getters.
+    public int getRepoId() {
+        return repoId;
+    }
 
     @Nullable
     public String getMainLang() {

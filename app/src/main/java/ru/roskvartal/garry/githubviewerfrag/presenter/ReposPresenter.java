@@ -12,6 +12,6 @@ import ru.roskvartal.garry.githubviewerfrag.view.ReposView;
  */
 public interface ReposPresenter extends MvpPresenter<ReposView> {
 
-    //  1) Загрузка Master данных - списка репозиториев.
+    //  Загрузка Master данных - списка репозиториев.
     void loadRepos(final boolean pullToRefresh);
 }
