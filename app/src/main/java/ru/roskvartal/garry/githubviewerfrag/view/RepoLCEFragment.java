@@ -23,19 +23,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import io.reactivex.schedulers.Schedulers;
-
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-
+import ru.roskvartal.garry.githubviewerfrag.MyApplication;
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.model.RepoModelImpl;
-import ru.roskvartal.garry.githubviewerfrag.model.api.GitHubService;
-import ru.roskvartal.garry.githubviewerfrag.model.api.ImageLoaderImpl;
 import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenter;
-import ru.roskvartal.garry.githubviewerfrag.presenter.ReposPresenterImpl;
 
 
 /**
@@ -59,7 +50,14 @@ public class RepoLCEFragment
 
     private Context listener;                                                   //  Слушатель - Активность.
 
-    private RepoRecyclerViewAdapter listAdapter;                                //  Адаптер RecyclerView.
+    //  DI Dagger 2 - Presenter.
+    //private final ReposPresenter presenter =
+
+    //  DI Dagger 2 - ImageLoader.
+    //private final ImageLoader<ImageView> imageLoader =
+
+    //  Адаптер RecyclerView.
+    private RepoRecyclerViewAdapter listAdapter;
 
     //  ButterKnife.
     @BindView(R.id.swipeRefresh) SwipeRefreshLayout swipeRefresh;
@@ -82,18 +80,14 @@ public class RepoLCEFragment
     }
 
 
+    //  + DI Dagger2
     @NonNull
     @Override
     public ReposPresenter createPresenter() {
-        return new ReposPresenterImpl(
-                new RepoModelImpl(
-                        new Retrofit.Builder().baseUrl(GitHubService.API_ENDPOINT)
-                        .addCallAdapterFactory(RxJava2CallAdapterFactory
-                                .createWithScheduler(Schedulers.io()))          //  Заменил при добавлении Realm.
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build()
-                        .create(GitHubService.class)
-                ));
+
+        return MyApplication.getApp()
+                .getAppComponent()
+                .getMasterPresenter();
     }
 
 
@@ -157,7 +151,10 @@ public class RepoLCEFragment
 
         //  Назначение адаптера для вывода строк.
         //  + Использование Picasso для загрузки Аватарок.
-        listAdapter = new RepoRecyclerViewAdapter(new ImageLoaderImpl());
+        //  + DI Dagger2
+        listAdapter = new RepoRecyclerViewAdapter(MyApplication.getApp()
+                .getAppComponent()
+                .getImageLoader());
 
         //  Обработчик нажатия на элементе списка.
         //  Вызывает callback метод onRepoListItemClicked() в активности.
@@ -181,6 +178,7 @@ public class RepoLCEFragment
 
     @Override
     public void onDetach() {
+
         listener = null;
         super.onDetach();
     }
@@ -189,6 +187,7 @@ public class RepoLCEFragment
     //  ButterKnife. Set the views to null.
     @Override
     public void onDestroyView() {
+
         unbinder.unbind();
         super.onDestroyView();
     }
@@ -206,19 +205,25 @@ public class RepoLCEFragment
     @Override
     public void loadData(boolean pullToRefresh) {
 
+        Log.d(LOGCAT_TAG, "LCEFragment.loadData(" + pullToRefresh + ")!");
+
         presenter.loadRepos(pullToRefresh);
     }
 
 
     @Override
     public void setData(List<GitHubRepoMaster> repos) {
-        //  FIXME Rx Retrofit Добавление данных одной пачкой в 100 заисей!
+
+        Log.d(LOGCAT_TAG, "LCEFragment.setData()!");
+
+        //  FIXME Rx Retrofit GitHub выдает данные о репозиториях одной пачкой в 100 заисей!
         listAdapter.setData(repos);
     }
 
 
     @Override
     public void showLoading(boolean pullToRefresh) {
+
         super.showLoading(pullToRefresh);
         swipeRefresh.setRefreshing(pullToRefresh);
     }
@@ -236,6 +241,7 @@ public class RepoLCEFragment
 
     @Override
     public void showError(Throwable e, boolean pullToRefresh) {
+
         swipeRefresh.setRefreshing(false);
         super.showError(e, pullToRefresh);
     }
@@ -243,6 +249,7 @@ public class RepoLCEFragment
 
     @Override
     protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
+
         String message = e.toString();
         return (message.isEmpty() ? ERR_UNKNOWN_ERR : message);
     }
@@ -252,6 +259,7 @@ public class RepoLCEFragment
     @NonNull
     @Override
     public LceViewState<List<GitHubRepoMaster>, ReposView> createViewState() {
+
         return new RetainingLceViewState<>();
     }
 
@@ -259,23 +267,14 @@ public class RepoLCEFragment
     @Nullable
     @Override
     public List<GitHubRepoMaster> getData() {
+
         return listAdapter.getData();
-    }
-
-
-    //  Очистка данных в адаптере при SwipeRefresh.
-    @Override
-    public void clearData(boolean pullToRefresh) {
-        if (pullToRefresh) {
-            listAdapter.clearData();
-        }
     }
 
 
     //  TEST
     //  Возвращает количество элементов в списке.
-    @Override
-    public int getDataCount() {
-        return listAdapter.getItemCount();
-    }
+    //public int getDataCount() {
+    //    return listAdapter.getItemCount();
+    //}
 }

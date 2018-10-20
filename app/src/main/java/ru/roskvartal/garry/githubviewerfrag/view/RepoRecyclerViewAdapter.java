@@ -2,6 +2,7 @@ package ru.roskvartal.garry.githubviewerfrag.view;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.model.api.ImageLoader;
+import ru.roskvartal.garry.githubviewerfrag.model.image.ImageLoader;
 import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 
 
@@ -30,19 +31,22 @@ import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerViewAdapter.RepoViewHolder> {
 
     //  Ссылка на данные.
+    @Nullable
     private List<GitHubRepoMaster> repos;
 
     //  Слушатель клика на элементе списка.
+    @Nullable
     private OnItemClickListener listener;
 
     //  ImageLoader для загрузки Аватарок.
+    @NonNull
     private ImageLoader<ImageView> imageLoader;
 
 
 
     //  Constructor.
-    public RepoRecyclerViewAdapter(ImageLoader<ImageView> imageLoader) {
-        repos = new ArrayList<>();
+    public RepoRecyclerViewAdapter(@NonNull ImageLoader<ImageView> imageLoader) {
+
         this.imageLoader = imageLoader;
     }
 
@@ -55,28 +59,23 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
 
 
     //  Установка слушателя.
-    public void setOnItemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(@NonNull OnItemClickListener listener) {
         this.listener = listener;
     }
 
 
     //  Rx: Добавление в список новой порции данных.
-    public void setData(List<GitHubRepoMaster> data) {
-        repos.addAll(data);
+    public void setData(@NonNull List<GitHubRepoMaster> data) {
+
+        repos = data;
         notifyDataSetChanged();
     }
 
 
     //  Для перехода на Mosby MVP LCE ViewState.
+    @Nullable
     public List<GitHubRepoMaster> getData() {
         return repos;
-    }
-
-
-    //  Очистка данных при SwipeRefresh.
-    public void clearData() {
-        repos.clear();
-        notifyDataSetChanged();
     }
 
 
@@ -98,7 +97,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
         @BindView(R.id.textRepoUrl) TextView repoUrl;
 
 
-        public RepoViewHolder(View rootView) {
+        RepoViewHolder(View rootView) {
             super(rootView);
 
             rootView.setOnClickListener(RepoViewHolder.this);
@@ -116,7 +115,7 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
         //  Обработчик клика на элементе списка.
         @Override
         public void onClick(View view) {
-            if (listener != null) {
+            if (listener != null && repos != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     listener.onItemClick(view, repos.get(position).getRepoId());
@@ -145,7 +144,11 @@ public class RepoRecyclerViewAdapter extends RecyclerView.Adapter<RepoRecyclerVi
     @Override
     public void onBindViewHolder(@NonNull RepoRecyclerViewAdapter.RepoViewHolder viewHolder, int position) {
 
+        if (repos == null) return;
+
         GitHubRepoMaster repo = repos.get(position);
+
+        if (repo == null) return;
 
         //  User Avatar (+ Загрузка через Picasso).
         imageLoader.loadImage(repo.getOwnerAvatarUrl(), viewHolder.userAvatar);

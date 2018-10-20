@@ -1,6 +1,7 @@
 package ru.roskvartal.garry.githubviewerfrag.model.entity;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -11,6 +12,8 @@ import com.google.gson.annotations.SerializedName;
  *  Детальные реквизиты репозитория (@GET("repos/{owner}/{repo}")).
  */
 public class GitHubRepoDetail {
+
+    private static final String EMPTY = "";
 
     @SerializedName("id")
     private int    repoId;              //  ID репозитория (id).
@@ -36,24 +39,24 @@ public class GitHubRepoDetail {
         return repoId;
     }
 
-    @Nullable
+    @NonNull
     public String getMainLang() {
-        return mainLang;
+        return mainLang != null ? mainLang : EMPTY;
     }
 
     public int getStarsCount() {
-        return starsCount;
+        return starsCount >= 0 ? starsCount : 0;
     }
 
     public int getWatchersCount() {
-        return watchersCount;
+        return watchersCount >= 0 ? watchersCount : 0;
     }
 
     public int getForksCount() {
-        return forksCount;
+        return forksCount >= 0 ? forksCount : 0;
     }
 
     public int getIssuesCount() {
-        return issuesCount;
+        return issuesCount >= 0 ? issuesCount : 0;
     }
 }

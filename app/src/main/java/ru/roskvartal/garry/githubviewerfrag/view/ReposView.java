@@ -16,7 +16,4 @@ import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
  */
 public interface ReposView extends MvpLceView<List<GitHubRepoMaster>> {
 
-    void clearData(boolean pullToRefresh);
-
-    int getDataCount();
 }

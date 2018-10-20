@@ -26,9 +26,11 @@ public interface RepoModel {
     @AnyThread
     Observable<? extends List<GitHubRepoMaster>> lifecycleRealm();
 
+
     @NonNull
     @AnyThread
     Observable<? extends List<GitHubRepoMaster>> loadFromRealm();
+
 
     @NonNull
     @AnyThread
@@ -36,7 +38,14 @@ public interface RepoModel {
 
 
     //  Загрузка Детальных данных выбранного репозитория.
+
     @NonNull
     @AnyThread
     Single<GitHubRepoDetail> getRepoDetail(String ownerName, String repoName);
+
+
+    //  Выборка репозитория по ID из БД Realm.
+    @NonNull
+    @AnyThread
+    GitHubRepoMaster getRepoMasterById(int repoId);
 }

@@ -1,6 +1,7 @@
 package ru.roskvartal.garry.githubviewerfrag.model.entity;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -16,6 +17,8 @@ import io.realm.annotations.PrimaryKey;
  *  Запрашиваются через GitHub API при помощи Retrofit запросом @GET("repositories").
  */
 public class GitHubRepoMaster extends RealmObject {
+
+    private static final String EMPTY = "";
 
     @PrimaryKey                         //  Требуется для правильной вставки в БД Realm без дубликатов.
     @SerializedName("id")
@@ -38,47 +41,30 @@ public class GitHubRepoMaster extends RealmObject {
         return repoId;
     }
 
-    @Nullable
+    @NonNull
     public String getRepoName() {
-        return repoName;
+        return repoName != null ? repoName : EMPTY;
     }
 
-    @Nullable
+    @NonNull
     public String getRepoDesc() {
-        return repoDesc;
+        return repoDesc != null ? repoDesc : EMPTY;
     }
 
-    @Nullable
+    @NonNull
     public String getRepoUrl() {
-        return repoUrl;
+        return repoUrl != null ? repoUrl : EMPTY;
     }
 
 
     //  Getters Owner.
-    @Nullable
+    @NonNull
     public String getOwnerName() {
-        if (owner == null) return null;
-        return owner.getOwnerName();
+        return owner != null ? owner.getOwnerName() : EMPTY;
     }
 
-    @Nullable
+    @NonNull
     public String getOwnerAvatarUrl() {
-        if (owner == null) return null;
-        return owner.getOwnerAvatarUrl();
+        return owner != null ? owner.getOwnerAvatarUrl() : EMPTY;
     }
-
-
-    //  Setters (для обновления в Realm).
-    public void setRepoName(String repoName) {
-        this.repoName = repoName;
-    }
-
-    public void setRepoDesc(String repoDesc) {
-        this.repoDesc = repoDesc;
-    }
-
-    public void setRepoUrl(String repoUrl) {
-        this.repoUrl = repoUrl;
-    }
-
 }

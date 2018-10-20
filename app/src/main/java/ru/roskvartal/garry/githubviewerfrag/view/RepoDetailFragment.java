@@ -1,21 +1,29 @@
 package ru.roskvartal.garry.githubviewerfrag.view;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableSingleObserver;
+import ru.roskvartal.garry.githubviewerfrag.MyApplication;
 import ru.roskvartal.garry.githubviewerfrag.R;
-import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepo;
+import ru.roskvartal.garry.githubviewerfrag.model.RepoModel;
+import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoDetail;
+import ru.roskvartal.garry.githubviewerfrag.model.entity.GitHubRepoMaster;
 
 
 /**
@@ -29,7 +37,7 @@ public class RepoDetailFragment extends Fragment {
     private static final String LOGCAT_TAG  = "DETAIL";                         //  DEBUG
     public  static final String ARG_REPO_ID = "REPO_ID";                        //  Для Интента и сохранения состояния.
 
-    private int repoID;                                                         //  ID передается из активности.
+    private int repoId;                                                         //  ID передается из активности.
 
     //  ButterKnife.
     //  Repo Language
@@ -43,13 +51,20 @@ public class RepoDetailFragment extends Fragment {
     //  Repo Issues Count
     @BindView(R.id.textRepoIssues) TextView repoIssues;
 
+
+    @Nullable
     private Unbinder unbinder;
 
+    @Nullable
+    private RepoModel model;                                                    //  MVP - Model.
+
+    @Nullable
+    private Disposable loading;
 
 
-    //  Метод для установки нового значения repoID, вызывается из DetailActivity.
-    public void setRepoId(int repoID) {
-        this.repoID = repoID;
+    //  Метод для установки нового значения repoId, вызывается из DetailActivity.
+    public void setRepoId(int repoId) {
+        this.repoId = repoId;
     }
 
 
@@ -59,7 +74,7 @@ public class RepoDetailFragment extends Fragment {
 
 
     //  Используется для инициализации фрагмента.
-    //  ACHTUNG!!! Т.к. инициализация фрагмента RepoDetailFragment ЗАВИСИТ от параметра repoID и
+    //  ACHTUNG!!! Т.к. инициализация фрагмента RepoDetailFragment ЗАВИСИТ от параметра repoId и
     //  метод setRepoId() вызывается владельцем Фрагмента только после создания фрагмента,
     //  то всю инициализацию надо выполнить в обработчике onStart()!
     @Override
@@ -67,7 +82,7 @@ public class RepoDetailFragment extends Fragment {
 
         //  Восстановление данных при повороте экрана.
         if (savedState != null) {
-            repoID = savedState.getInt(ARG_REPO_ID, 0);
+            repoId = savedState.getInt(ARG_REPO_ID, 0);
         }
 
         // Inflate the layout for this fragment
@@ -76,12 +91,16 @@ public class RepoDetailFragment extends Fragment {
         //  ButterKnife.
         unbinder = ButterKnife.bind(this, rootView);
 
+        //  Модель уже инициализирована в Презентере Мастера -> restApi тоже инициализировано.
+        model = MyApplication.getApp().getAppComponent().getRepoModel();
+
         return rootView;
     }
 
 
     //  Вызывается после onCreate() активности и перед тем, как фрагмент становится видимым.
     //  Параметр repoID уже установлен методом setRepoId() в обработчике onCreate() активности!
+    //@SuppressLint("CheckResult")
     @Override
     public void onStart() {
         super.onStart();
@@ -91,26 +110,36 @@ public class RepoDetailFragment extends Fragment {
 
         //  Переход на Retrofit / Picasso / Realm.
 
+        //  Запрос Мастер данных из локальной БД.
+        GitHubRepoMaster repo = model.getRepoMasterById(repoId);
 
-        //  Repo Language
-        //TextView repoLang = rootView.findViewById(R.id.textRepoLang);
-        repoLang.setText(GitHubRepo.repos[repoID].getMainLang());
+        //  Запрос Детальных данных из Интернет через restApi по данным Мастера: OwnerName, RepoName.
+        loading = model.getRepoDetail(repo.getOwnerName(), repo.getRepoName())
+                .subscribeWith(new DisposableSingleObserver<GitHubRepoDetail>() {
+                    @Override
+                    public void onSuccess(GitHubRepoDetail data) {
+                        //  Repo Language
+                        repoLang.setText(data.getMainLang());
 
-        //  Repo Stars Count
-        //TextView repoStars = rootView.findViewById(R.id.textRepoStars);
-        repoStars.setText(String.valueOf(GitHubRepo.repos[repoID].getStarsCount()));
+                        //  Repo Stars Count
+                        repoStars.setText(String.valueOf(data.getStarsCount()));
 
-        //  Repo Watchers Count
-        //TextView repoWatchs = rootView.findViewById(R.id.textRepoWatchers);
-        repoWatchs.setText(String.valueOf(GitHubRepo.repos[repoID].getWatchersCount()));
+                        //  Repo Watchers Count
+                        repoWatchs.setText(String.valueOf(data.getWatchersCount()));
 
-        //  Repo Forks Count
-        //TextView repoForks = rootView.findViewById(R.id.textRepoForks);
-        repoForks.setText(String.valueOf(GitHubRepo.repos[repoID].getForksCount()));
+                        //  Repo Forks Count
+                        repoForks.setText(String.valueOf(data.getForksCount()));
 
-        //  Repo Issues Count
-        //TextView repoIssues = rootView.findViewById(R.id.textRepoIssues);
-        repoIssues.setText(String.valueOf(GitHubRepo.repos[repoID].getIssuesCount()));
+                        //  Repo Issues Count
+                        repoIssues.setText(String.valueOf(data.getIssuesCount()));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
 
         //  Отображение встроенного СТАТИЧЕСКОГО <fragment> RepoMainInfoFragment для вывода основной
@@ -121,7 +150,7 @@ public class RepoDetailFragment extends Fragment {
 
         //  Передаем repoID вложенному фрагменту, он заполнит свои представления правильным контентом.
         if (fragmentRepoMainInfo != null) {
-            fragmentRepoMainInfo.setRepoId(repoID);
+            fragmentRepoMainInfo.setRepoId(repoId);
         }
 
     }
@@ -130,7 +159,7 @@ public class RepoDetailFragment extends Fragment {
     //  Сохранение состояния Фрагмента перед уничтожением.
     @Override
     public void onSaveInstanceState(@NonNull Bundle saveState) {
-        saveState.putInt(ARG_REPO_ID, repoID);
+        saveState.putInt(ARG_REPO_ID, repoId);
         super.onSaveInstanceState(saveState);
     }
 
@@ -139,6 +168,30 @@ public class RepoDetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+
+        if (unbinder != null) {
+            unbinder.unbind();
+            unbinder = null;
+        }
+
+        unsubscribe(loading);
+        loading = null;
     }
+
+
+    //  Отписка от потока.
+    private void unsubscribe(@Nullable Disposable source) {
+
+        if (isSubscribed(source)) {
+            source.dispose();
+        }
+    }
+
+
+    //  Проверка подписки на поток.
+    private boolean isSubscribed(@Nullable Disposable source) {
+
+        return source != null && !source.isDisposed();
+    }
+
 }

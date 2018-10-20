@@ -1,4 +1,4 @@
-package ru.roskvartal.garry.githubviewerfrag.model.api;
+package ru.roskvartal.garry.githubviewerfrag.model.image;
 
 
 import android.graphics.Bitmap;

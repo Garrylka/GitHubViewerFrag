@@ -1,8 +1,7 @@
-package ru.roskvartal.garry.githubviewerfrag.model.api;
+package ru.roskvartal.garry.githubviewerfrag.model.image;
 
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 
 /**
@@ -10,5 +9,5 @@ import android.support.annotation.Nullable;
  */
 public interface ImageLoader<T> {
 
-    void loadImage(@Nullable String url, @NonNull T view);
+    void loadImage(@NonNull String url, @NonNull T view);
 }

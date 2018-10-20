@@ -1,6 +1,7 @@
 package ru.roskvartal.garry.githubviewerfrag.model.entity;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -16,6 +17,8 @@ import io.realm.annotations.PrimaryKey;
  *  Требуется для правильной автоматической десериализации Json данных о public репозиториях с сервера GitHub.
  */
 public class GitHubRepoOwner extends RealmObject {
+
+    private static final String EMPTY = "";
 
     @PrimaryKey                         //  Требуется для правильной вставки в БД Realm без дубликатов.
     @SerializedName("id")
@@ -33,13 +36,14 @@ public class GitHubRepoOwner extends RealmObject {
         return ownerId;
     }
 
-    @Nullable
+    @NonNull
     public String getOwnerName() {
-        return ownerName;
+        return ownerName != null ? ownerName : EMPTY;
     }
 
-    @Nullable
-    public String getOwnerAvatarUrl() {
-        return ownerAvatarUrl;
+    @NonNull
+    public String getOwnerAvatarUrl()
+    {
+        return ownerAvatarUrl != null ? ownerAvatarUrl : EMPTY;
     }
 }

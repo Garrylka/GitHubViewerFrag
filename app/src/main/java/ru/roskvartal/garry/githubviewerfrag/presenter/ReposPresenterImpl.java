@@ -36,6 +36,7 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
 
     @Nullable
     private Disposable lifecycle;
+    @Nullable
     private Disposable loading;
 
 
@@ -45,22 +46,16 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
     }
 
 
-    //  TODO Перенести инициализацию API из Модели/Презентера в Синглтон приложения!
-    //  FIXME
-    @NonNull
-    public RepoModel getModel() { return model; }
-
-
     //  Приложение стартует и в attachView() подписывается через поток lifecycleRealm()
     //  на отложенный поток данных loadFromRealm(). Одновременно происходит подключение к БД Realm.
     //  Потом Mosby внутри себя дергает метод loadRepos() и выполняется подписка на потоки (дерганье)
     //  loadFromRealm() и loadFromInet().
-    //  Загрузка данных из Интернет происходит в потоке loadFromInet(). Одновременно идет вставка
-    //  данных в БД (если их еще там нет) или их обновление.
+    //  Загрузка данных из Интернет происходит в потоке loadFromInet(). Одновременно идет вставка и
+    //  обновление данных в БД.
     //  При любом (?) изменении данных в БД данные (какие именно?) приходят в потоке loadFromRealm(),
-    //  который передает их во VIEW.
+    //  который передает их во VIEW через подписку на lifecycleRealm().
     //
-    //  ACHTUNG! Проверить в каких случаях вызывается attachView()? + включен Mosby ViewState!
+    //  ACHTUNG! Проверить в каких случаях вызывается attachView()/detachView() с учетом Mosby ViewState!
     @Override
     public void attachView(@NonNull ReposView view) {
 
@@ -80,10 +75,7 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
                                 Log.d(LOGCAT_TAG, "lifecycle().onNext(): " + data.size());
 
                                 //  Отображение данных.
-                                ifViewAttached(v -> {
-                                    v.clearData(true);
-                                    v.setData(data);
-                                });
+                                ifViewAttached(v -> v.setData(data));
                             },
                             error -> {
                                 //Log.d(LOGCAT_TAG, "lifecycle().onError(): " + error.toString());
@@ -92,7 +84,7 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
                                 ifViewAttached(v -> v.showError(error, false));
                             },
                             () -> {
-                                //  Событие onComplete() никогда не наступит!
+                                //  ACHTUNG! Событие onComplete() никогда не наступит!
                                 Log.d(LOGCAT_TAG, "lifecycle().onComplete()!");
                             }
                     );
@@ -100,11 +92,11 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
     }
 
 
-    //  Загрузка Master данных - списка репозиториев.
+    //  Загрузка Мастер данных - список public репозиториев.
     @Override
     public void loadRepos(final boolean pullToRefresh) {
 
-        Log.d(LOGCAT_TAG, "Presenter.loadRepos(" + pullToRefresh + ")!");
+        //Log.d(LOGCAT_TAG, "Presenter.loadRepos(" + pullToRefresh + ")!");
 
         unsubscribe(loading);
 
@@ -143,7 +135,7 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
     }
 
 
-    //  Presenter будет уничтожен.
+    //  Presenter унчтожается.
     @Override
     public void destroy() {
         Log.d(LOGCAT_TAG, "Presenter.destroy()!");
@@ -154,48 +146,6 @@ public class ReposPresenterImpl extends MvpBasePresenter<ReposView> implements R
 
         super.destroy();
     }
-
-
-
-/*
-
-    @Override
-    public void loadRepos(final boolean pullToRefresh) {
-
-        loading = model.getRepos()
-                //  TEST .doOnSuccess(d -> Log.d(LOGCAT_TAG, "doOnSuccess() on Thread: " + Thread.currentThread().getName()))
-                .doOnDispose(() -> Log.d(LOGCAT_TAG, "doOnDispose()!"))
-                .doOnSubscribe(d -> {
-                    Log.d(LOGCAT_TAG, "doOnSubscribe() on Thread: " + Thread.currentThread().getName());
-
-                    ifViewAttached(view -> {
-                        view.clearData(pullToRefresh);
-                        view.showLoading(pullToRefresh);
-                    });
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        data -> {
-                            Log.d(LOGCAT_TAG, "onSuccess() on Thread: " + Thread.currentThread().getName());
-                            Log.d(LOGCAT_TAG, "onSuccess(): " + data.size());
-
-                            ifViewAttached(view -> {
-                                view.setData(data);
-                                view.showContent();
-                            });
-                        },
-                        error -> {
-                            Log.d(LOGCAT_TAG, "onError(): " + error.toString());
-
-                            ifViewAttached(view -> view.showError(error, pullToRefresh));
-                        }
-                        //,
-                        //() -> ifViewAttached(
-                        //    view -> Log.d(LOGCAT_TAG, "onComplete(): " + view.getDataCount())
-                        //)
-                );
-    }
-*/
 
 
     //  Отписка от потока.
